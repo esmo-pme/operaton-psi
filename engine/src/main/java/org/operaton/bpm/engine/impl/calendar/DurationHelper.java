@@ -16,6 +16,8 @@
  */
 package org.operaton.bpm.engine.impl.calendar;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +41,6 @@ import org.operaton.bpm.engine.impl.util.EngineUtilLogger;
 public class DurationHelper {
 
   public static final String PNW_PATTERN = "P\\d+W";
-  private static final int MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
   private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   Date start;
@@ -111,7 +112,7 @@ public class DurationHelper {
         period = parsePeriod(expression.get(1));
       } else {
         end = DateTimeUtil.parseDate(expression.get(1));
-        period = datatypeFactory.newDuration(end.getTime()-start.getTime());
+        period = newElapsedDuration(end.getTime() - start.getTime());
       }
     }
   }
@@ -185,10 +186,20 @@ public class DurationHelper {
     return datatypeFactory.newDuration(period);
   }
 
+  // DatatypeFactory.newDuration(long) must not be used for periods: it turns the milliseconds into years, months and
+  // days counted from 1970-01-01, so adding the result to another date gives a different length (downstream F-5).
+
   private Duration parsePnWDuration(String period) {
-    String weeks = period.replaceAll("\\D", "");
-    long duration = Long.parseLong(weeks) * MS_PER_WEEK;
-    return datatypeFactory.newDuration(duration);
+    // ISO 8601: nW is n * 7 days, i.e. the same as PnD with seven times the number
+    BigInteger days = BigInteger.valueOf(Long.parseLong(period.replaceAll("\\D", ""))).multiply(BigInteger.valueOf(7));
+    return datatypeFactory.newDuration(true, BigInteger.ZERO, BigInteger.ZERO, days, BigInteger.ZERO, BigInteger.ZERO,
+        BigDecimal.ZERO);
+  }
+
+  private Duration newElapsedDuration(long millis) {
+    // the exact elapsed time between start and end, kept in seconds so that month lengths do not matter
+    return datatypeFactory.newDuration(millis >= 0, BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO,
+        BigInteger.ZERO, BigDecimal.valueOf(Math.abs(millis), 3));
   }
 
   private boolean isDuration(String time) {

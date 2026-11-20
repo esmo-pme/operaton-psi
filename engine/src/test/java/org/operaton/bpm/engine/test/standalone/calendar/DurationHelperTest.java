@@ -17,6 +17,7 @@
 package org.operaton.bpm.engine.test.standalone.calendar;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 
 import org.junit.jupiter.api.AfterEach;
@@ -151,6 +152,35 @@ class DurationHelperTest {
 
     // then
     assertThat(dh.getDateAfter()).isEqualTo(parse("19700604-00:00:00"));
+  }
+
+  // downstream F-5: weeks were converted to months and days counted from 1970-01-01, so only start dates in
+  // January 1970 gave the right result
+  @Test
+  void shouldAddWeeksAsSevenDaysFromAnyStartDate() throws Exception {
+    assertThat(new DurationHelper("P5W", parse("20260201-00:00:00")).getDateAfter())
+        .isEqualTo(parse("20260308-00:00:00"));
+    assertThat(new DurationHelper("P8W", parse("20260201-00:00:00")).getDateAfter())
+        .isEqualTo(parse("20260329-00:00:00"));
+    assertThat(new DurationHelper("P52W", parse("20260301-00:00:00")).getDateAfter())
+        .isEqualTo(parse("20270228-00:00:00"));
+  }
+
+  @Test
+  void shouldRepeatWeeksAsSevenDaysFromAnyStartDate() throws Exception {
+    DurationHelper dh = new DurationHelper("R/2026-02-01T00:00:00Z/P5W");
+
+    assertThat(dh.getDateAfter(Date.from(Instant.parse("2026-02-01T12:00:00Z"))))
+        .isEqualTo(Date.from(Instant.parse("2026-03-08T00:00:00Z")));
+  }
+
+  // downstream F-5: the length of a start/end interval was converted the same way
+  @Test
+  void shouldRepeatStartEndIntervalWithItsExactLength() {
+    DurationHelper dh = new DurationHelper("R3/2026-02-01T00:00:00Z/2026-03-08T00:00:00Z");
+
+    assertThat(dh.getDateAfter(Date.from(Instant.parse("2026-03-08T12:00:00Z"))))
+        .isEqualTo(Date.from(Instant.parse("2026-04-12T00:00:00Z")));
   }
 
   private Date parse(String str) throws Exception {
