@@ -111,3 +111,22 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   0 errors, 89 skipped.
 - **Drop when:** upstream merges PR 3110 or an equivalent (possibly as an opt-in toggle; then switch to upstream's
   form and configure it); re-check the log code then.
+
+### F-4: recognise SQL errors by code, not only by English message text (2026-11-20)
+
+- **Changed:** `ExceptionUtil.checkValueTooLongException`, `checkConstraintViolationException` and
+  `checkForeignKeyConstraintViolation` check SQLState and vendor codes first (`22001` and Oracle `12899`/`1461`/`1401`
+  value too long; SQLState class `23` constraint violation; `23503`, `23506`, DB2 `-532`, SQL Server `547`, MySQL
+  `1451`/`1452`, Oracle `2291`/`2292` foreign key) and keep the English message checks as fallback; messages are
+  lowercased with `Locale.ROOT`, and a missing message no longer ends the check. Every check only gets broader.
+- **Why:** with non-English database messages some errors were not recognised and surfaced as a generic
+  `ProcessEnginePersistenceException` (no built-in error code, REST 500 instead of 400). On PostgreSQL 18.7 with
+  `lc_messages = de_DE.UTF-8`, `22001: Wert zu lang für Typ character varying(3)` was not recognised as "value too
+  long". With our default English messages nothing changes.
+- **Upstream:** issue [#570](https://github.com/operaton/operaton/issues/570), open PR
+  [4073](https://github.com/operaton/operaton/pull/4073) (commit `345d363be1` by Tim Zöller), taken over unchanged.
+  Findings log: `..\Review\FINDINGS.md` F-4.
+- **Test:** the PR's additions to `ExceptionUtilTest` (German messages per database, Turkish locale, no message):
+  11 of 29 cases fail without the fix, all pass with it. Error-code, identity and variable tests (119 tests) green.
+  Full engine suite with the fix: 16255 tests, 0 failures, 0 errors, 89 skipped.
+- **Drop when:** upstream merges PR 4073 (or an equivalent) into the base we use.
