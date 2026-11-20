@@ -38,6 +38,20 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   `TESTING.md`, `.devenv/scripts/README.md`) still mention some removed files.
 - **Drop when:** never needed; keep them deleted when taking a newer upstream base.
 
+### `.gitattributes`: LF for the npm frontends (2026-11-20)
+
+- **Added:** `.gitattributes` with `text=auto eol=lf` for `webapps/frontend/**`, `webapps-neo/frontend/**` and
+  `engine-rest/docs/**`. Upstream has no `.gitattributes`.
+- **Why:** on this Windows machine (`core.autocrlf=true`) the frontend sources were checked out with CRLF, and the
+  legacy webapps build (`npm run build`, ESLint with `prettier/prettier`) failed with thousands of "Delete `␍`"
+  errors, so the WildFly distribution could not be built. The repository stores these files as LF (checked: 1518
+  LF, 63 binary, none CRLF or mixed), so the attribute changes only the checkout, not the content. Other files keep
+  the machine's setting (e.g. `mvnw.cmd` stays CRLF).
+- **Verified:** after re-checkout the folders are LF in the working tree and `git status` is clean apart from the new
+  file; the WildFly distribution build passes the webapps frontend (see the build entry in
+  `..\Review\FINDINGS.md` / `..\Artifacts\BUILD-INFO-*.md`).
+- **Drop when:** never needed on Linux/macOS; keep it as long as downstream is built on Windows.
+
 ### Version `2.2.2-orange.1` (2026-11-20)
 
 - **Changed:** project version `2.2.2` → `2.2.2-orange.1` in every reactor POM (`versions:set`), the non-reactor

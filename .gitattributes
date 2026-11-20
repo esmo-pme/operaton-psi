@@ -1,0 +1,6 @@
+# downstream (see FORK-PATCHES.md): the npm frontends lint their sources with ESLint + Prettier, which rejects
+# CRLF line endings. On Windows with core.autocrlf=true they were checked out with CRLF and the build failed.
+# Keep LF in the working tree for these directories on every machine (the repository stores them as LF).
+webapps/frontend/** text=auto eol=lf
+webapps-neo/frontend/** text=auto eol=lf
+engine-rest/docs/** text=auto eol=lf
