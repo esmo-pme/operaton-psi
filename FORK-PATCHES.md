@@ -21,6 +21,24 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
 - **Drop when:** never needed; when taking a newer upstream base, re-apply these deletions or resolve the conflicts by
   keeping them deleted.
 
+### GitHub, IDE and upstream-release files removed (2026-11-20)
+
+- **Removed:** `.github/` (workflows, actions, issue/PR templates, labels, Dependabot, CODEOWNERS, CI scripts),
+  `jreleaser.yml` (GitHub release tooling), `.devcontainer/`, `.sonarlint/`, `.devenv/ide/`,
+  `.devenv/scripts/release/`, `.devenv/scripts/maintenance/update-slack-link.sh`,
+  `.devenv/scripts/maintenance/update-nodejs-version.sh` (edits GitHub workflows), and the stray
+  `.mvn/wrapper/.!94984!maven-wrapper.jar` (a leftover partial download; the wrapper uses `distributionType=only-script`).
+- **Moved:** `.github/scripts/set-project-version.sh` to `.devenv/scripts/maintenance/set-project-version.sh`, kept for
+  setting a downstream version. Before use, adapt it: it still updates `.github/jreleaser/changelog.tpl` (deleted) and
+  uses BSD `sed -i ''`, which GNU sed in Git Bash does not accept.
+- **Kept on purpose:** `.mvn/` (Maven wrapper pinning 3.10.1, `maven.config` with the Java 25 XML limit and test time
+  zone, build-cache extension), `.devenv/clirr-ignore.xml` (used by the `check-api-compatibility` profile in
+  `parent/pom.xml`), and the build, code-cleanup, smoke-test and tool scripts under `.devenv/scripts/`.
+- **Why:** the branch is built locally; GitHub CI, releases and IDE connected-mode settings are not used.
+- **Verified:** `.\mvnw.cmd -N validate` still succeeds with Maven 3.10.1 on JDK 25. Upstream docs (`CONTRIBUTING.md`,
+  `TESTING.md`, `.devenv/scripts/README.md`) still mention some removed files.
+- **Drop when:** never needed; keep them deleted when taking a newer upstream base.
+
 ## Code fixes
 
 None yet.

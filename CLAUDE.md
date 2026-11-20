@@ -44,7 +44,10 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
 - `install` writes `org.operaton:*:2.2.2` into `~/.m2/repository`, shadowing the released 2.2.2 artifacts from Maven
   Central. Anything outside this repository that depends on released 2.2.2 (for example reproducer projects) picks up
   the local build afterwards.
-- Helper scripts under `.devenv/scripts` are `.sh`; run them from Git Bash or WSL.
+- Helper scripts under `.devenv/scripts` are `.sh`; run them from Git Bash or WSL. GitHub CI (`.github/`) was removed
+  from this branch; do not look for workflows. `.mvn/` is required by the wrapper and must stay.
+- Changing the project version: `.devenv/scripts/maintenance/set-project-version.sh <version>` (also updates the
+  non-reactor `distro/run` POMs and `package.json` files). Adapt it first, see `FORK-PATCHES.md`.
 
 ## Tests
 
