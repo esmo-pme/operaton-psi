@@ -130,3 +130,55 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   11 of 29 cases fail without the fix, all pass with it. Error-code, identity and variable tests (119 tests) green.
   Full engine suite with the fix: 16255 tests, 0 failures, 0 errors, 89 skipped.
 - **Drop when:** upstream merges PR 4073 (or an equivalent) into the base we use.
+
+### F-5: week durations and start/end intervals keep their exact length (2026-11-20)
+
+- **Changed:** `DurationHelper` builds `PnW` as `n * 7` days and the period of a `start/end` interval as its exact
+  elapsed time, instead of `DatatypeFactory.newDuration(long millis)`. That constructor turns milliseconds into
+  years/months/days counted from 1970-01-01, so `P5W` became `P1M4D` and was 32 to 35 days long depending on the
+  start date (`P52W` up to 367 days); start/end intervals repeated days off. `P5W` now behaves exactly like `P35D`.
+- **Upstream:** no issue or PR (own fix; found by the code inspection). Findings log: `..\Review\FINDINGS.md` F-5.
+- **Test:** `DurationHelperTest.shouldAddWeeksAsSevenDaysFromAnyStartDate`, `shouldRepeatWeeksAsSevenDaysFromAnyStartDate`,
+  `shouldRepeatStartEndIntervalWithItsExactLength`: fail without the fix (e.g. 2026-03-05 instead of 2026-03-08),
+  pass with it. Duration, calendar and timer tests (173) green. Full engine suite with F-5 to F-7: 16262 tests,
+  0 failures, 0 errors, 89 skipped.
+- **Drop when:** upstream fixes `DurationHelper` the same way.
+
+### F-6: reject a cron expression that never matches (2026-11-20)
+
+- **Changed:** `CronTimer.getDueDate` throws when cron-utils finds no next execution (it gives up after 100 years),
+  instead of returning the start date. `CycleBusinessCalendar` turns that into `ENGINE-09026 Exception while parsing
+  cycle expression '<expression>'`. Before, an expression such as `0 0 0 30 2 ?` (30 February) deployed fine, was due
+  immediately and repeated endlessly (a timer start event started instances in a tight loop). Now such a deployment
+  fails, and an existing timer with such an expression fails with an incident instead of looping.
+- **Upstream:** no issue or PR (own fix). Findings log: `..\Review\FINDINGS.md` F-6.
+- **Test:** `CycleBusinessCalendarTest.shouldRejectCronExpressionWithoutNextExecution` (2 cases) and
+  `StartTimerEventTest.shouldRejectDeploymentOfCronCycleWithoutNextExecution`: fail without the fix, pass with it.
+  Calendar, timer and cron tests (176) green. Full engine suite: see F-5.
+- **Drop when:** upstream handles the missing next execution.
+
+### F-7: job acquisition keeps `ROOT_PROC_INST_ID_` (2026-11-20)
+
+- **Changed:** `Job.xml` `updateAcquirableJob` no longer writes `ROOT_PROC_INST_ID_`. The acquisition selects read
+  that column only when acquiring exclusively over process hierarchies (off by default), so locking a job wrote NULL
+  into it; queries by root process instance then missed every job that stayed in the table (retries left,
+  incidents). Acquisition never changes the root process instance.
+- **Upstream:** no issue or PR (own fix). Findings log: `..\Review\FINDINGS.md` F-7.
+- **Test:** `AcquireJobsCmdTest.shouldKeepRootProcessInstanceIdWhenAcquiringJob` (job of a called subprocess, default
+  setting): fails without the fix (`null` instead of the root id), passes with it. Job executor, job query and
+  concurrency tests (347) green. Full engine suite: see F-5.
+- **Drop when:** upstream fixes the acquisition update or select.
+
+### F-9: WildFly job-executor pool uses its configured thread factory (2026-11-20)
+
+- **Changed (WildFly subsystem):** `JobExecutorAdd` passes the installed `ThreadFactoryService` to the pool
+  (`EnhancedQueueExecutorService.setThreadFactorySupplier`, used in `start`) and sets the name pattern `%G - %t`;
+  `JobExecutorRemove` also removes the thread factory service. Before, the factory was installed but never used:
+  job-executor threads were named `pool-N-thread-M` in the creating thread's group. Now they run in the group
+  `Operaton BPM <pool name>` with names `Operaton BPM <pool name> - <n>` (thread dumps, monitoring). The threads'
+  context class loader is unchanged (it is inherited from the creating thread with either factory).
+- **Upstream:** no issue or PR (own fix). Findings log: `..\Review\FINDINGS.md` F-9.
+- **Test:** `JBossSubsystemXMLTest.shouldRunJobExecutorThreadsWithConfiguredThreadFactory` (runs a task on the real
+  MSC pool): fails without the fix (thread group `main`), passes with it. Subsystem tests (28) green, with
+  `-Pdistro-wildfly`.
+- **Drop when:** upstream wires the thread factory.
