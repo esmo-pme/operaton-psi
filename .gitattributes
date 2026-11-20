@@ -1,6 +1,16 @@
-# downstream (see FORK-PATCHES.md): the npm frontends lint their sources with ESLint + Prettier, which rejects
-# CRLF line endings. On Windows with core.autocrlf=true they were checked out with CRLF and the build failed.
-# Keep LF in the working tree for these directories on every machine (the repository stores them as LF).
+# downstream (see FORK-PATCHES.md): this branch is built on Windows with core.autocrlf=true, which checks text files
+# out with CRLF. Keep LF in the working tree where CRLF breaks the build or the Linux distributions. All paths below
+# are stored as LF in the repository, so these rules change only the checkout, not the content.
+
+# npm frontends: ESLint + Prettier reject CRLF and fail the build
 webapps/frontend/** text=auto eol=lf
 webapps-neo/frontend/** text=auto eol=lf
 engine-rest/docs/** text=auto eol=lf
+
+# distributions: files copied verbatim into the archives run on Linux (start.sh, WildFly bin/standalone.conf)
+distro/** text=auto eol=lf
+*.sh text eol=lf
+*.conf text eol=lf
+
+# webapps-neo backend: its tests compare resource contents with LF strings
+webapps-neo/assembly/** text=auto eol=lf

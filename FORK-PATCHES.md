@@ -38,10 +38,18 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   `TESTING.md`, `.devenv/scripts/README.md`) still mention some removed files.
 - **Drop when:** never needed; keep them deleted when taking a newer upstream base.
 
-### `.gitattributes`: LF for the npm frontends (2026-11-20)
+### `.gitattributes`: LF where CRLF breaks the build or the Linux distribution (2026-11-20/21)
 
-- **Added:** `.gitattributes` with `text=auto eol=lf` for `webapps/frontend/**`, `webapps-neo/frontend/**` and
-  `engine-rest/docs/**`. Upstream has no `.gitattributes`.
+- **Added:** `.gitattributes` with `text=auto eol=lf` for `webapps/frontend/**`, `webapps-neo/frontend/**`,
+  `engine-rest/docs/**`, `distro/**` and `webapps-neo/assembly/**`, and `text eol=lf` for `*.sh` and `*.conf`.
+  Upstream has no `.gitattributes`.
+- **Second step (2026-11-21):** the first archive built on this machine contained `start.sh` and WildFly
+  `bin/standalone.conf` (from `distro/wildfly/assembly/resources/`) with CRLF; `standalone.conf` is sourced by
+  `standalone.sh` on Linux, so the archive was not fit for a Linux container. Hence `distro/**`, `*.sh` and
+  `*.conf`. `webapps-neo/assembly/**` fixes two tests that compare resource contents with LF strings
+  (`QuerySessionFactoryTest.buildMappingsShouldBuildValidXml`, `TemplateFilterTest.getWebResourceContents...`).
+  A rule for all files is not possible: 198 Java/BPMN/XML/XSD files are stored with CRLF or mixed endings and
+  would show as modified.
 - **Why:** on this Windows machine (`core.autocrlf=true`) the frontend sources were checked out with CRLF, and the
   legacy webapps build (`npm run build`, ESLint with `prettier/prettier`) failed with thousands of "Delete `␍`"
   errors, so the WildFly distribution could not be built. The repository stores these files as LF (checked: 1518
