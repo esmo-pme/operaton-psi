@@ -162,4 +162,22 @@ class CycleBusinessCalendarTest {
       .hasMessageContaining("Exception while parsing cycle expression");
 
   }
+
+  // downstream F-6: a cron expression without a next execution returned the start date ("now"), so a repeating
+  // timer with such an expression was due immediately and kept firing
+  @ParameterizedTest
+  @CsvSource(delimiter = '|', textBlock = """
+      0 0 0 30 2 ?
+      0 0 0 31 4 *
+      """)
+  void shouldRejectCronExpressionWithoutNextExecution(String expression) throws Exception {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy MM dd HH:mm");
+    CycleBusinessCalendar cbc = new CycleBusinessCalendar();
+    Date startDate = sdf.parse("2026 11 20 10:00");
+
+    assertThatThrownBy(() -> cbc.resolveDuedate(expression, startDate))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Exception while parsing cycle expression")
+      .hasMessageContaining(expression);
+  }
 }

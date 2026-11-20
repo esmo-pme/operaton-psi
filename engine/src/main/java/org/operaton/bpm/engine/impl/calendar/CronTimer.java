@@ -46,7 +46,10 @@ public class CronTimer {
       .map(ZonedDateTime::toInstant)
       .map(Instant::toEpochMilli);
 
-    return new Date(next.orElse(fromEpochMilli));
+    // No next execution means the expression can never match (e.g. 30 February; cron-utils gives up after 100
+    // years). Returning the start date made such a timer due immediately and fire endlessly (downstream F-6).
+    return new Date(next.orElseThrow(() -> new IllegalArgumentException(
+        "Cron expression '" + cron.asString() + "' has no execution after " + afterTime.toInstant())));
   }
 
   public static CronTimer parse(final String text) throws ParseException {

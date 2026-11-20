@@ -1848,4 +1848,19 @@ class StartTimerEventTest {
         .done());
   }
 
+  // downstream F-6: a cron cycle that never matches (30 February) used to deploy and then start instances endlessly
+  @Test
+  void shouldRejectDeploymentOfCronCycleWithoutNextExecution() {
+    BpmnModelInstance model = Bpmn.createExecutableProcess("impossibleCron")
+        .startEvent()
+        .timerWithCycle("0 0 0 30 2 ?")
+        .endEvent()
+        .done();
+
+    org.assertj.core.api.Assertions.assertThatThrownBy(() -> testRule.deploy(model))
+        .isInstanceOf(org.operaton.bpm.engine.ProcessEngineException.class)
+        .hasMessageContaining("0 0 0 30 2 ?");
+    assertThat(managementService.createJobQuery().count()).isZero();
+  }
+
 }
