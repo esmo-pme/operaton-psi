@@ -26,50 +26,38 @@ fi
 NEW_VERSION=$1
 CURRENT_VERSION=$(./mvnw help:evaluate -N -q -Dexpression=project.version -DforceStdout |tail -n 1)
 
-# compute the next version
-if [[ $NEW_VERSION =~ ^(.*-)([0-9]+)$ ]]; then
-  # Version ends with "-<number>", increment that number (e.g. rc-1 -> rc-2)
-  PREFIX="${BASH_REMATCH[1]}"
-  NUMBER="${BASH_REMATCH[2]}"
-  NEXT_NUMBER=$((NUMBER + 1))
-  NEXT_VERSION="${PREFIX}${NEXT_NUMBER}"
-else
-  # Semantic versioning: Increment minor level and set patch to 0 (e.g. 1.2.3 -> 1.3.0)
-  if [[ $NEW_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-    MAJOR="${BASH_REMATCH[1]}"
-    MINOR="${BASH_REMATCH[2]}"
-    NEXT_MINOR=$((MINOR + 1))
-    NEXT_VERSION="${MAJOR}.${NEXT_MINOR}.0"
-  else
-    NEXT_VERSION="$NEW_VERSION"
-  fi
-fi
+# Downstream change (see FORK-PATCHES.md): in-place edits use perl instead of `sed -i ''` (BSD only) so the script
+# runs in Git Bash, WSL and macOS; versions are matched literally (\Q...\E), not as regex; no backup POMs; without
+# npm only the root version of each package-lock.json is changed; the jreleaser and next-version steps were removed.
+export CURRENT_VERSION NEW_VERSION
 
-NEW_VERSION_WITHOUT_SNAPSHOT=$(echo $NEW_VERSION | sed 's/-SNAPSHOT//')
-CURRENT_VERSION_WITHOUT_SNAPSHOT=$(echo $CURRENT_VERSION | sed 's/-SNAPSHOT//')
-NEXT_VERSION_WITHOUT_SNAPSHOT=$(echo $NEXT_VERSION | sed 's/-SNAPSHOT//')
-
-
-echo "🔍 Current project version is $CURRENT_VERSION, updating to $NEW_VERSION_WITHOUT_SNAPSHOT" and setting next version to $NEXT_VERSION
+echo "🔍 Current project version is $CURRENT_VERSION, updating to $NEW_VERSION"
 
 echo "🔄 Updating version in pom.xml files"
 
-./mvnw versions:set -q -DnewVersion=$NEW_VERSION
+./mvnw versions:set -q -DnewVersion="$NEW_VERSION" -DgenerateBackupPoms=false || exit 1
 
 echo "🔄 Updating version in package.json files"
-PACKAGE_JSON_FILES=($(find . -name package.json -not -path "*/node_modules/*"))
+PACKAGE_JSON_FILES=($(find . -name package.json -not -path "*/node_modules/*" -not -path "*/target/*"))
 
 for PACKAGE_JSON_FILE in "${PACKAGE_JSON_FILES[@]}"; do
-  sed -i '' -e "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" $PACKAGE_JSON_FILE
+  perl -pi -e 's/"version": "\Q$ENV{CURRENT_VERSION}\E"/"version": "$ENV{NEW_VERSION}"/' "$PACKAGE_JSON_FILE"
 done
 
-echo "🔄 Regenerating package-lock.json files via npm install"
-PACKAGE_LOCK_FILES=($(find . -name package-lock.json -not -path "*/node_modules/*"))
+PACKAGE_LOCK_FILES=($(find . -name package-lock.json -not -path "*/node_modules/*" -not -path "*/target/*"))
 
 for PACKAGE_LOCK_FILE in "${PACKAGE_LOCK_FILES[@]}"; do
   PACKAGE_LOCK_DIR=$(dirname "$PACKAGE_LOCK_FILE")
-  echo "  Running npm install --package-lock-only --ignore-scripts in $PACKAGE_LOCK_DIR"
-  (cd "$PACKAGE_LOCK_DIR" && npm install --package-lock-only --ignore-scripts)
+  if command -v npm > /dev/null; then
+    echo "🔄 Regenerating $PACKAGE_LOCK_FILE via npm install --package-lock-only --ignore-scripts"
+    (cd "$PACKAGE_LOCK_DIR" && npm install --package-lock-only --ignore-scripts)
+  else
+    echo "🔄 npm not found, updating only the root version in $PACKAGE_LOCK_FILE"
+    # the file's top-level "version" and the one in packages[""]; dependency entries are left alone
+    perl -0pi -e 's/\A(\{\s*"name": "[^"]*",\s*"version": ")\Q$ENV{CURRENT_VERSION}\E"/$1$ENV{NEW_VERSION}"/;
+                  s/(""\s*:\s*\{\s*"name": "[^"]*",\s*"version": ")\Q$ENV{CURRENT_VERSION}\E"/$1$ENV{NEW_VERSION}"/' \
+      "$PACKAGE_LOCK_FILE"
+  fi
 done
 
 echo "🔄 Updating version in pom.xml files that are not part of the reactor"
@@ -90,18 +78,11 @@ POM_FILES=(\
 )
 
 for POM_FILE in "${POM_FILES[@]}"; do
-  sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" $POM_FILE
+  perl -pi -e 's/<version>\Q$ENV{CURRENT_VERSION}\E<\/version>/<version>$ENV{NEW_VERSION}<\/version>/g' "$POM_FILE"
 done
 
-echo "🔄 Updating version in .github/jreleaser/changelog.tpl"
-if [[ $NEW_VERSION_WITHOUT_SNAPSHOT =~ ^([0-9]+)\.([0-9]+)\. ]]; then
-  MAJOR="${BASH_REMATCH[1]}"
-  MINOR="${BASH_REMATCH[2]}"
-  NEW_VERSION_UNDERSCORE="${MAJOR}_${MINOR}"
-  sed -i '' "s|release-notes/[0-9_]*/|release-notes/${NEW_VERSION_UNDERSCORE}/|" .github/jreleaser/changelog.tpl
-fi
-
-MISSED_FILES=$(grep -R "$CURRENT_VERSION" --include pom.xml --include package.json  .)
+MISSED_FILES=$(grep -RF -e ">$CURRENT_VERSION<" -e "\"$CURRENT_VERSION\"" --include pom.xml --include package.json \
+  --exclude-dir node_modules --exclude-dir target .)
 if [[ -n "$MISSED_FILES" ]]; then
   echo "⚠️ The following files still contain the old version:"
   echo "$MISSED_FILES"

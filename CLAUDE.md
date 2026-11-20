@@ -8,15 +8,14 @@ branch; upstream's `TESTING.md` and `CONTRIBUTING.md` are still accurate referen
 
 ## This checkout
 
-- Terms: **upstream** is the official Operaton project (`github.com/operaton/operaton`; local read-only reference copy
-  in `C:\Users\pmetz\repos\Operaton\upstream`). **Downstream** is this local copy derived from it. Changes flow from
-  upstream down to us, never back.
-- This folder, `C:\Users\pmetz\repos\Operaton\downstream`, is a git worktree of `..\upstream` on the local branch
-  **`2.2.2-orange`**, created from the upstream release tag **`v2.2.2`** (commit `76a6873d`), not from upstream `main`.
-  **The branch and its changes stay on this machine: never push.** The `origin` remote is upstream; use it only to
-  fetch. Move or rename these folders only with `git worktree move` / `git worktree repair`, never in Explorer.
+- Workspace layout and shared rules (upstream/downstream, never push, topic folders) are in `..\CLAUDE.md`.
+- This folder is a git worktree of `..\upstream` on the local branch **`2.2.2-orange`**, created from the upstream
+  release tag **`v2.2.2`** (commit `76a6873d`), not from upstream `main`. The `origin` remote is upstream; fetch only.
+- Project version is **`2.2.2-orange.1`** (all POMs and `package.json` files). Change it only with
+  `.devenv/scripts/maintenance/set-project-version.sh <version>` from Git Bash, then run `.\mvnw.cmd validate`.
 - Upstream maintains `release/2.2.x` after 2.2.2. Check it (and `main`) for an existing fix before writing one.
 - Record every deviation from `v2.2.2` in `FORK-PATCHES.md` (reason, upstream issue, proving test, removal condition).
+  Review notes, findings and reproducers live in `..\Review\`, not in this repository.
 - Versions: trust the root `pom.xml` (for `v2.2.2`: Spring Boot 4.1.3, Spring 7.0.11, Quarkus 3.40.1.2, MyBatis 3.5.19,
   Liquibase 4.33.0) and `parent/pom.xml` (WildFly 41.0.1.Final). Upstream docs list older versions.
 - Toolchain: JDK 25 (Temurin) and Maven 3.10.1 through the wrapper. Keep `maven.compiler.release=17`.
@@ -41,13 +40,15 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
 - `.mvn/maven.config` applies to every wrapper build: `-Duser.timezone=Europe/Berlin`,
   `-Djdk.xml.elementAttributeLimit=200` (required on Java 25 for `BpmnParseTest`), `--batch-mode`, and the Maven
   build cache disabled (opt in with `-Dmaven.build.cache.enabled=true`). Tests run in Europe/Berlin unless overridden.
-- `install` writes `org.operaton:*:2.2.2` into `~/.m2/repository`, shadowing the released 2.2.2 artifacts from Maven
-  Central. Anything outside this repository that depends on released 2.2.2 (for example reproducer projects) picks up
-  the local build afterwards.
+- `install` writes `org.operaton:*:2.2.2-orange.1` into `~/.m2/repository`, next to (not over) the released 2.2.2
+  artifacts. Reproducers in `..\Review\reproducers` use released 2.2.2 by default; test a local build with
+  `'-Doperaton.version=2.2.2-orange.1'`.
+- The WildFly archive is `distro/wildfly/distro/target/operaton-bpm-wildfly-<version>.tar.gz`; the handoff to
+  deployment (`..\Artifacts\`) is described in `..\Review\PLAN.md`.
 - Helper scripts under `.devenv/scripts` are `.sh`; run them from Git Bash or WSL. GitHub CI (`.github/`) was removed
   from this branch; do not look for workflows. `.mvn/` is required by the wrapper and must stay.
-- Changing the project version: `.devenv/scripts/maintenance/set-project-version.sh <version>` (also updates the
-  non-reactor `distro/run` POMs and `package.json` files). Adapt it first, see `FORK-PATCHES.md`.
+- `qa/test-db-instance-migration/test-fixture-725` pins the released `2.2.2` engine on purpose (it creates the
+  upgrade fixture); do not bump it to the downstream version.
 
 ## Tests
 

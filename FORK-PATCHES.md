@@ -29,8 +29,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   `.devenv/scripts/maintenance/update-nodejs-version.sh` (edits GitHub workflows), and the stray
   `.mvn/wrapper/.!94984!maven-wrapper.jar` (a leftover partial download; the wrapper uses `distributionType=only-script`).
 - **Moved:** `.github/scripts/set-project-version.sh` to `.devenv/scripts/maintenance/set-project-version.sh`, kept for
-  setting a downstream version. Before use, adapt it: it still updates `.github/jreleaser/changelog.tpl` (deleted) and
-  uses BSD `sed -i ''`, which GNU sed in Git Bash does not accept.
+  setting a downstream version (adapted in the next entry).
 - **Kept on purpose:** `.mvn/` (Maven wrapper pinning 3.10.1, `maven.config` with the Java 25 XML limit and test time
   zone, build-cache extension), `.devenv/clirr-ignore.xml` (used by the `check-api-compatibility` profile in
   `parent/pom.xml`), and the build, code-cleanup, smoke-test and tool scripts under `.devenv/scripts/`.
@@ -38,6 +37,35 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
 - **Verified:** `.\mvnw.cmd -N validate` still succeeds with Maven 3.10.1 on JDK 25. Upstream docs (`CONTRIBUTING.md`,
   `TESTING.md`, `.devenv/scripts/README.md`) still mention some removed files.
 - **Drop when:** never needed; keep them deleted when taking a newer upstream base.
+
+### Version `2.2.2-orange.1` (2026-11-20)
+
+- **Changed:** project version `2.2.2` → `2.2.2-orange.1` in every reactor POM (`versions:set`), the non-reactor
+  `distro/run` POMs, `engine-rest/docs` and `webapps/frontend` `package.json`, and the root entries of their
+  `package-lock.json` (dependency entries untouched; `node_modules/ent` stays at its own `2.2.2`).
+- **Not changed on purpose:** `qa/test-db-instance-migration/test-fixture-725/pom.xml` keeps
+  `operaton.version.current=2.2.2`: it builds the 7.25 upgrade fixture with the released upstream engine, so the
+  suite tests an upgrade from upstream 2.2.2 to downstream.
+- **Script adapted** (`.devenv/scripts/maintenance/set-project-version.sh`): in-place edits with `perl -pi` instead of
+  BSD `sed -i ''`; versions matched literally (`\Q...\E`), not as a regex; `-DgenerateBackupPoms=false`; without npm,
+  only the root version of each `package-lock.json` is changed; the jreleaser changelog step and the unused
+  next-version calculation removed; the leftover check matches the exact old version.
+- **Why:** a local `install` no longer overwrites the released `org.operaton:*:2.2.2` in `~/.m2`, and archives
+  (`operaton-bpm-wildfly-2.2.2-orange.1.tar.gz`, `*-2.2.2-orange.1.war`) can be told apart from upstream's. The
+  engine treats the version as an opaque string (`ProductPropertiesUtil`, `ParseUtil`, Spring Boot
+  `OperatonBpmVersion`); nothing parses it as `x.y.z`.
+- **Verified:** `.\mvnw.cmd validate` succeeds for all 130 reactor projects at `2.2.2-orange.1`.
+- **Drop when:** never; set the next number (`2.2.2-orange.2`) for each build handed to deployment, and a new base
+  version (for example `2.2.3-orange.1`) when taking a newer upstream tag.
+
+### `.gitignore` additions (2026-11-20)
+
+- **Added** (marked block at the end of the root `.gitignore`): H2 2.x database files `*.mv.db` and `*.trace.db`
+  (upstream only ignores the H2 1.x `*.h2.db`), `*.orig` / `*.rej` left by cherry-picks and backports, and
+  `.claude/settings.local.json` (Claude Code personal settings).
+- **Verified:** `git check-ignore` matches each pattern; `git ls-files -ci --exclude-standard` shows no tracked file
+  affected.
+- **Drop when:** never needed; re-apply on a newer upstream base unless upstream adds the same patterns.
 
 ## Code fixes
 

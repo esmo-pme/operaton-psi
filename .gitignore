@@ -47,3 +47,13 @@ sloc.txt
 /.worktrees
 .devenv/scripts/smoketest/screenshots/
 .skip-deploy
+
+# downstream additions (see FORK-PATCHES.md)
+# H2 2.x database files (*.h2.db above is the H2 1.x format)
+*.mv.db
+*.trace.db
+# leftovers from cherry-picks, backports and patch application
+*.orig
+*.rej
+# Claude Code personal settings (permissions, local paths); shared settings would go in .claude/settings.json
+.claude/settings.local.json
