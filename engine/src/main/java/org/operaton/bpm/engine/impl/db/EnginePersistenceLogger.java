@@ -811,6 +811,17 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     ));
   }
 
+  // code 112: upstream PR 3110 uses "111", which downstream already uses for processInstanceDeletedConcurrently (PR 4018)
+  public void logFormKeyExpressionEvaluationException(String taskId, String expression, Exception cause) {
+    logWarn(
+      "112",
+      "Failed to evaluate form key expression '{}' for task '{}'. The form key will be set to null. Cause: {}",
+      expression,
+      taskId,
+      cause.getMessage()
+    );
+  }
+
   public static List<SQLException> findRelatedSqlExceptions(Throwable exception) {
     List<SQLException> sqlExceptionList = new ArrayList<>();
     Throwable cause = exception;

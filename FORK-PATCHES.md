@@ -88,3 +88,26 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   fail with the NPEs from the issue; with the fix all 4 pass (H2, JDK 25). Full engine suite with the fix: 16230
   tests, 0 failures, 0 errors, 89 skipped.
 - **Drop when:** upstream merges PR 4018 (or an equivalent fix) into the base we use; then take upstream's version.
+
+### F-3: failing `formKey` expression no longer breaks task lists (2026-11-20)
+
+- **Changed:** `TaskEntity.initializeFormKeyFromTaskDefinition` catches an exception from evaluating a user task's
+  `formKey` expression, logs a warning (`ENGINE-03112`, new `EnginePersistenceLogger.logFormKeyExpressionEvaluationException`)
+  and leaves `formKey = null`. Before, one task with a failing expression (e.g. `${nonExistentVariable}`) made every
+  `TaskQuery.initializeFormKeys()` call and every task filter list (the Tasklist path) fail, healthy tasks included.
+  `operaton:formRef` handling is unchanged.
+- **Behaviour change (accepted by the owner):** callers no longer get a `ProcessEngineException` for a broken
+  form-key expression; `getFormKey() == null` now means either "no form key" or "evaluation failed" (only the log
+  tells them apart). This is why upstream maintainers object to the PR.
+- **Upstream:** draft PR [3110](https://github.com/operaton/operaton/pull/3110) (commit `d4e35353a2` by Julian Haupt,
+  backported from Fluxnova commit `0e8e2ec390` by Sowmya, HL), taken over unchanged except the log code: the PR uses
+  `111`, which downstream already uses for F-2, so downstream uses `112`. No upstream issue. Findings log:
+  `..\Review\FINDINGS.md` F-3.
+- **Test:** the PR's `TaskQueryTest.testInitializeFormKeyWithInvalidExpressionReturnsNullForSingleTask` and
+  `...DoesNotBlockTaskListRetrieval` with `oneTaskWithInvalidFormKeyExpressionProcess.bpmn20.xml`: both fail without
+  the fix (`ProcessEngineException: Unknown property used in expression`), pass with it. `TaskQueryTest` and all
+  `Filter*Test`: 377 tests green. The filter path was checked with a temporary probe (not committed): filter list
+  returns both tasks, the broken one with `formKey=null`. Full engine suite with the fix: 16232 tests, 0 failures,
+  0 errors, 89 skipped.
+- **Drop when:** upstream merges PR 3110 or an equivalent (possibly as an opt-in toggle; then switch to upstream's
+  form and configure it); re-check the log code then.
