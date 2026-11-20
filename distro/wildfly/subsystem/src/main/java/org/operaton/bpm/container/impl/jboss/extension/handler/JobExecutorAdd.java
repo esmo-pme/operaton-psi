@@ -16,6 +16,7 @@
  */
 package org.operaton.bpm.container.impl.jboss.extension.handler;
 
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -88,6 +89,8 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
     ThreadFactoryService threadFactory = new ThreadFactoryService();
     threadFactory.setThreadGroupName(THREAD_POOL_GRP_NAME + name);
+    // downstream F-9: thread names "<group> - <n>" instead of jboss-threads' default "pool-<f>-thread-<n>"
+    threadFactory.setNamePattern("%G - %t");
 
     ServiceName threadFactoryServiceName = ServiceNames.forThreadFactoryService(name);
 
@@ -100,8 +103,11 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
         .setKeepAliveTime(KEEPALIVE_TIME.resolveModelAttribute(context, model).asInt(), TimeUnit.SECONDS)
         .allowCoreThreadTimeOut(ALLOW_CORE_TIMEOUT.resolveModelAttribute(context, model).asBoolean());
 
-    ServiceBuilder<EnhancedQueueExecutor> queueExecutorBuilder = serviceTarget.addService(jobExecutorThreadPoolServiceName, new EnhancedQueueExecutorService(executorBuilder));
-    queueExecutorBuilder.requires(threadFactoryServiceName);
+    EnhancedQueueExecutorService executorService = new EnhancedQueueExecutorService(executorBuilder);
+    ServiceBuilder<EnhancedQueueExecutor> queueExecutorBuilder = serviceTarget.addService(jobExecutorThreadPoolServiceName, executorService);
+    // downstream F-9: use the configured thread factory for the pool, not only depend on it
+    Supplier<ThreadFactory> threadFactorySupplier = queueExecutorBuilder.requires(threadFactoryServiceName);
+    executorService.setThreadFactorySupplier(threadFactorySupplier);
     queueExecutorBuilder.setInitialMode(ServiceController.Mode.ACTIVE).install();
   }
 

@@ -41,6 +41,8 @@ public class JobExecutorRemove extends AbstractRemoveStepHandler {
     String jobExecutorThreadPoolName = SubsystemAttributeDefinitons.THREAD_POOL_NAME.resolveModelAttribute(context, model).asString();
     ServiceName jobExecutorThreadPoolServiceName = ServiceNames.forManagedThreadPool(jobExecutorThreadPoolName);
     context.removeService(jobExecutorThreadPoolServiceName);
+    // downstream F-9: JobExecutorAdd also installs a thread factory service for the pool
+    context.removeService(ServiceNames.forThreadFactoryService(jobExecutorThreadPoolName));
   }
 
 }

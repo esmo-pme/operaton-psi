@@ -427,6 +427,28 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     commonSubsystemServicesAreInstalled(container);
   }
 
+  // downstream F-9: the configured thread factory was installed but never passed to the job-executor pool, so the
+  // threads ran with the default factory (names "pool-N-thread-M", no "Operaton BPM ..." thread group)
+  @Test
+  void shouldRunJobExecutorThreadsWithConfiguredThreadFactory() throws Exception {
+    String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR);
+    KernelServices services = createKernelServicesBuilder(null)
+        .setSubsystemXml(subsystemXml)
+        .build();
+    ServiceContainer container = services.getContainer();
+    EnhancedQueueExecutor executor =
+        (EnhancedQueueExecutor) container.getRequiredService(PLATFORM_JOBEXECUTOR_MANAGED_THREAD_POOL_SERVICE_NAME).awaitValue();
+
+    java.util.concurrent.CompletableFuture<Thread> worker = new java.util.concurrent.CompletableFuture<>();
+    executor.execute(() -> worker.complete(Thread.currentThread()));
+    Thread thread = worker.get(10, java.util.concurrent.TimeUnit.SECONDS);
+
+    String expectedGroup = "Operaton BPM " + SubsystemAttributeDefinitons.DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME;
+    assertThat(thread.getThreadGroup()).isNotNull();
+    assertThat(thread.getThreadGroup().getName()).isEqualTo(expectedGroup);
+    assertThat(thread.getName()).startsWith(expectedGroup);
+  }
+
   @Test
   void testParseSubsystemWithJobExecutorAndPropertiesXml() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES);

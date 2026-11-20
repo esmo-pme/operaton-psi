@@ -16,6 +16,9 @@
  */
 package org.operaton.bpm.container.impl.jboss.extension.handler;
 
+import java.util.concurrent.ThreadFactory;
+import java.util.function.Supplier;
+
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StopContext;
@@ -26,13 +29,22 @@ public class EnhancedQueueExecutorService implements Service<EnhancedQueueExecut
 
   protected Builder executorBuilder;
   protected EnhancedQueueExecutor executor;
+  protected Supplier<ThreadFactory> threadFactorySupplier;
 
   public EnhancedQueueExecutorService(Builder executorBuilder) {
     this.executorBuilder = executorBuilder;
   }
 
+  /** The thread factory service this pool depends on; its value is used for the pool's threads (downstream F-9). */
+  public void setThreadFactorySupplier(Supplier<ThreadFactory> threadFactorySupplier) {
+    this.threadFactorySupplier = threadFactorySupplier;
+  }
+
   @Override
   public void start(StartContext context) {
+    if (threadFactorySupplier != null) {
+      executorBuilder.setThreadFactory(threadFactorySupplier.get());
+    }
     executor = executorBuilder.build();
   }
 
