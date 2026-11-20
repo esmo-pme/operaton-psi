@@ -983,6 +983,9 @@
     </update>
 
     <!-- ACQUIRABLE JOB UPDATE -->
+    <!-- downstream F-7: ROOT_PROC_INST_ID_ is not written here. The acquisition selects read it only when
+         acquiring exclusively over process hierarchies, so writing it back set it to NULL by default;
+         acquisition never changes it. -->
     <update id="updateAcquirableJob" parameterType="org.operaton.bpm.engine.impl.persistence.entity.AcquirableJobEntity">
       update ${prefix}ACT_RU_JOB
       <set>
@@ -990,7 +993,6 @@
           LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
           DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
-          ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR},
           PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR},
           EXCLUSIVE_ = #{exclusive, jdbcType=BOOLEAN},
       </set>

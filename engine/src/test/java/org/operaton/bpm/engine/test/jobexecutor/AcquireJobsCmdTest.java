@@ -33,6 +33,7 @@ import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.test.Deployment;
 import org.operaton.bpm.engine.test.junit5.ProcessEngineExtension;
+import org.operaton.bpm.model.bpmn.Bpmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -113,6 +114,32 @@ class AcquireJobsCmdTest {
   private AcquiredJobs executeAcquireJobsCommand() {
     return processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new AcquireJobsCmd(processEngineConfiguration.getJobExecutor()));
+  }
+
+  // downstream F-7: with the default (acquire exclusive per process instance) the acquisition query does not read
+  // ROOT_PROC_INST_ID_, and locking the job wrote it back as NULL
+  @Test
+  void shouldKeepRootProcessInstanceIdWhenAcquiringJob() {
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("child.bpmn", Bpmn.createExecutableProcess("child").startEvent()
+            .serviceTask().operatonAsyncBefore().operatonExpression("${true}").endEvent().done())
+        .addModelInstance("parent.bpmn", Bpmn.createExecutableProcess("parent").startEvent()
+            .callActivity().calledElement("child").endEvent().done())
+        .deploy().getId();
+    try {
+      assertThat(processEngineConfiguration.isJobExecutorAcquireExclusiveOverProcessHierarchies()).isFalse();
+      String rootProcessInstanceId = runtimeService.startProcessInstanceByKey("parent").getId();
+      Job job = managementService.createJobQuery().singleResult();
+      assertThat(job.getRootProcessInstanceId()).isEqualTo(rootProcessInstanceId);
+
+      assertThat(executeAcquireJobsCommand().size()).isEqualTo(1);
+
+      assertThat(managementService.createJobQuery().jobId(job.getId()).singleResult().getRootProcessInstanceId())
+          .isEqualTo(rootProcessInstanceId);
+      assertThat(managementService.createJobQuery().rootProcessInstanceId(rootProcessInstanceId).count()).isEqualTo(1);
+    } finally {
+      repositoryService.deleteDeployment(deploymentId, true);
+    }
   }
 
 }
