@@ -69,4 +69,22 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
 
 ## Code fixes
 
-None yet.
+### F-2: `OptimisticLockingException` instead of NPE when a process instance vanishes (2026-11-20)
+
+- **Changed:** `ExecutionEntity.ensureExecutionTreeInitialized` (execution tree prefetch enabled, the default) and
+  `ExecutionEntity.ensureProcessInstanceInitialized` (prefetch disabled) throw an `OptimisticLockingException`
+  (`ENGINE-03111`, new `EnginePersistenceLogger.processInstanceDeletedConcurrently`) when the process instance of an
+  already loaded execution was deleted by a concurrent transaction. Before, both paths ended in a
+  `NullPointerException`; the job executor then decremented retries and finally created an incident for a job whose
+  process instance no longer exists. With the OLE, `JobRetryCmd` does not decrement retries and the failed-job
+  handling skips the vanished job.
+- **Upstream:** issue [#4017](https://github.com/operaton/operaton/issues/4017), open PR
+  [4018](https://github.com/operaton/operaton/pull/4018) (commits `bc1bc01543` and `5e46da064b` by shardtVLH), taken
+  over unchanged; not merged upstream on 2026-11-20. Findings log: `..\Review\FINDINGS.md` F-2.
+- **Not covered (as in the PR):** `ensureParentInitialized` with prefetch *disabled* can still return a `null` parent
+  in the same race; with the default (prefetch enabled) it goes through the fixed `ensureExecutionTreeInitialized`.
+- **Test:** `engine/src/test/java/org/operaton/bpm/engine/test/concurrency/CompetingProcessInstanceDeletionTest.java`
+  (from the PR; 4 cases: direct load and full job execution, each with prefetch on and off). Without the fix all 4
+  fail with the NPEs from the issue; with the fix all 4 pass (H2, JDK 25). Full engine suite with the fix: 16230
+  tests, 0 failures, 0 errors, 89 skipped.
+- **Drop when:** upstream merges PR 4018 (or an equivalent fix) into the base we use; then take upstream's version.
