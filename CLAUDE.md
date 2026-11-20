@@ -53,7 +53,14 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
   resolves to the WSL launcher (no distribution installed), and needs `xmllint`. Skip it with `'-Dexec.skip=true'`
   and check the module `resource-root` paths by hand (see `..\Artifacts\BUILD-INFO-2.2.2-orange.1.md`).
 - The WildFly archive is `distro/wildfly/distro/target/operaton-bpm-wildfly-<version>.tar.gz`; the handoff to
-  deployment (`..\Artifacts\`) is described in `..\Review\PLAN.md`.
+  deployment (`..\Artifacts\`) is described in `..\Review\PLAN.md`. Check line endings of archive files with `file`,
+  not `grep $'\r'` (Git Bash's grep hides carriage returns); `.gitattributes` keeps `distro/**`, `*.sh` and `*.conf`
+  LF.
+- Run module tests one module per Maven call: `ArchRulesTest` (from `test-utils/archunit`) imports with
+  `DoNotIncludeJars`, so when model-api modules are in the same `-pl` reactor their `target/classes` are scanned too
+  and it fails on model-api packages.
+- Known Windows-only test failure: `webapps-neo/assembly` `QuerySessionFactoryTest.buildMappingsShouldBuildValidXml`
+  (code uses `%n`, test expects `\n`).
 - Helper scripts under `.devenv/scripts` are `.sh`; run them from Git Bash or WSL. GitHub CI (`.github/`) was removed
   from this branch; do not look for workflows. `.mvn/` is required by the wrapper and must stay.
 - `qa/test-db-instance-migration/test-fixture-725` pins the released `2.2.2` engine on purpose (it creates the
