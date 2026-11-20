@@ -43,11 +43,17 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
 - `install` writes `org.operaton:*:2.2.2-orange.1` into `~/.m2/repository`, next to (not over) the released 2.2.2
   artifacts. Reproducers in `..\Review\reproducers` use released 2.2.2 by default; test a local build with
   `'-Doperaton.version=2.2.2-orange.1'`.
-- The WildFly modules (`distro/wildfly/*`, incl. the subsystem and its tests) are only in the reactor with
-  **`-Pdistro-wildfly`** (profile not active by default; activating it switches off the default `distro-tomcat` and
-  webjar profiles). Example: `.\mvnw.cmd test -Pdistro-wildfly -pl distro/wildfly/subsystem`.
-- The WildFly archive is `distro/wildfly/distro/target/operaton-bpm-wildfly-<version>.tar.gz` (built with
-  `-Pdistro-wildfly`); the handoff to deployment (`..\Artifacts\`) is described in `..\Review\PLAN.md`.
+- The WildFly modules (`distro/wildfly/*`, incl. the subsystem and its tests) are only in the reactor with the
+  profile `distro-wildfly`, which is not active by default. Naming a profile explicitly switches off all
+  `activeByDefault` profiles, including `distro`, which holds the normal module list. So: subsystem tests alone with
+  `.\mvnw.cmd test -Pdistro-wildfly -pl distro/wildfly/subsystem`; the WildFly archive with
+  `.\mvnw.cmd clean install '-Pdistro,distro-wildfly' -DskipTests -pl distro/wildfly/distro -am` (quote the comma
+  in PowerShell).
+- On this Windows machine the `validate-wildfly-modules` step of `distro/wildfly/modules` fails: it runs `bash`, which
+  resolves to the WSL launcher (no distribution installed), and needs `xmllint`. Skip it with `'-Dexec.skip=true'`
+  and check the module `resource-root` paths by hand (see `..\Artifacts\BUILD-INFO-2.2.2-orange.1.md`).
+- The WildFly archive is `distro/wildfly/distro/target/operaton-bpm-wildfly-<version>.tar.gz`; the handoff to
+  deployment (`..\Artifacts\`) is described in `..\Review\PLAN.md`.
 - Helper scripts under `.devenv/scripts` are `.sh`; run them from Git Bash or WSL. GitHub CI (`.github/`) was removed
   from this branch; do not look for workflows. `.mvn/` is required by the wrapper and must stay.
 - `qa/test-db-instance-migration/test-fixture-725` pins the released `2.2.2` engine on purpose (it creates the
