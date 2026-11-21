@@ -30,8 +30,7 @@ import org.operaton.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.operaton.bpm.qa.rolling.update.RollingUpdateTest;
 import org.operaton.bpm.qa.rolling.update.RollingUpdateConstants;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -78,7 +77,7 @@ class HistoryCleanupTest extends AbstractRollingUpdateTestCase {
 
       // assume
       for (Job job : jobs) {
-        assertThat(job.getDuedate(), is(addSeconds(currentDate, (int)(Math.pow(2., (double)4) * 10))));
+        assertThat(job.getDuedate()).isEqualTo(addSeconds(currentDate, (int)(Math.pow(2., (double)4) * 10)));
       }
 
       List<HistoricProcessInstance> processInstances = rule.getHistoryService()
@@ -87,8 +86,8 @@ class HistoryCleanupTest extends AbstractRollingUpdateTestCase {
         .list();
 
       // assume
-      assertThat(jobs.size(), is(3));
-      assertThat(processInstances.size(), is(15));
+      assertThat(jobs.size()).isEqualTo(3);
+      assertThat(processInstances.size()).isEqualTo(15);
 
       ClockUtil.setCurrentTime(addDays(currentDate, 5));
 
@@ -101,7 +100,7 @@ class HistoryCleanupTest extends AbstractRollingUpdateTestCase {
         .list();
 
       // then
-      assertThat(processInstances.size(), is(10));
+      assertThat(processInstances.size()).isEqualTo(10);
 
       // when
       rule.getManagementService().executeJob(jobTwo.getId());
@@ -112,7 +111,7 @@ class HistoryCleanupTest extends AbstractRollingUpdateTestCase {
         .list();
 
       // then
-      assertThat(processInstances.size(), is(5));
+      assertThat(processInstances.size()).isEqualTo(5);
 
       // when
       rule.getManagementService().executeJob(jobThree.getId());
@@ -123,7 +122,7 @@ class HistoryCleanupTest extends AbstractRollingUpdateTestCase {
         .list();
 
       // then
-      assertThat(processInstances.size(), is(0));
+      assertThat(processInstances.size()).isEqualTo(0);
     }
   }
 

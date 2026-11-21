@@ -402,3 +402,7 @@ longer compile. Upstream still ships the JUnit 4 API (`main`, November 2026). Fi
   3,691 + 102, engine-spring 76, engine-cdi 61, model-api 1,105 / 302 / 289, typed-values 59, freemarker 10,
   starter 186, webapp-neo-core 50, webapp-neo 2, WildFly subsystem 28 (1 skipped, as before), upgrade suite 291
   (4 skipped) -- all green.
+- **Rolling-update suite (`qa/test-db-rolling-update`, run 2026-11-21):** its tests used Hamcrest, which only came
+  through `junit:junit`; 5 classes moved to AssertJ. Needs the released engine `1.0.0-beta-5` (downloaded with the
+  owner's OK, about 14 MB). `.\mvnw.cmd clean install -f qa/pom.xml -Prolling-update,h2 -pl '!load-test'
+  '-Ddatabase.port=19092'`: 56 tests green.

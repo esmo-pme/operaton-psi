@@ -22,8 +22,7 @@ import org.operaton.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.operaton.bpm.qa.rolling.update.RollingUpdateTest;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * This test ensures that the old engine can read an empty String variable created by the new engine.
@@ -43,7 +42,7 @@ class EmptyStringVariableTest extends AbstractRollingUpdateTestCase {
         .singleResult();
 
     // then
-    assertThat(variableInstance.getValue(), is(""));
+    assertThat(variableInstance.getValue()).isEqualTo("");
   }
 
   @RollingUpdateTest
@@ -54,7 +53,7 @@ class EmptyStringVariableTest extends AbstractRollingUpdateTestCase {
         .variableValueEquals("myStringVar", "");
 
     // then
-    assertThat(variableInstanceQuery.count(), is(1L));
+    assertThat(variableInstanceQuery.count()).isEqualTo(1L);
   }
 
   @RollingUpdateTest
@@ -65,7 +64,7 @@ class EmptyStringVariableTest extends AbstractRollingUpdateTestCase {
         .variableValueNotEquals("myStringVar", "");
 
     // then
-    assertThat(variableInstanceQuery.count(), is(0L));
+    assertThat(variableInstanceQuery.count()).isEqualTo(0L);
   }
 
 }

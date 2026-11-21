@@ -24,9 +24,7 @@ import org.operaton.bpm.engine.ManagementService;
 import org.operaton.bpm.engine.RuntimeService;
 import org.operaton.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -46,6 +44,6 @@ public abstract class AbstractTimestampUpdateTest extends AbstractRollingUpdateT
   }
 
   protected void assertNotNull(Object object) {
-    assertThat(object, is(notNullValue()));
+    assertThat(object).isNotNull();
   }
 }

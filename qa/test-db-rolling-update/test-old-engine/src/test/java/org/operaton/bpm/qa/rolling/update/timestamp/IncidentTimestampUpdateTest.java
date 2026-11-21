@@ -21,8 +21,7 @@ import org.operaton.bpm.qa.rolling.update.RollingUpdateTest;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -46,6 +45,6 @@ class IncidentTimestampUpdateTest extends AbstractTimestampUpdateTest {
     assertNotNull(incident);
 
     // then
-    assertThat(incident.getIncidentTimestamp(), is(TIMESTAMP));
+    assertThat(incident.getIncidentTimestamp()).isEqualTo(TIMESTAMP);
   }
 }

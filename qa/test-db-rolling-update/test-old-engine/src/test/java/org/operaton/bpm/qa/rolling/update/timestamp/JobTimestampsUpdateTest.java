@@ -24,8 +24,7 @@ import org.operaton.bpm.qa.rolling.update.RollingUpdateTest;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -47,7 +46,7 @@ class JobTimestampsUpdateTest extends AbstractTimestampUpdateTest {
     assertNotNull(job);
 
     // then
-    assertThat(job.getDuedate(), is(TIMESTAMP));
+    assertThat(job.getDuedate()).isEqualTo(TIMESTAMP);
   }
 
   @ScenarioUnderTest("initJobTimestamps.1")
@@ -60,6 +59,6 @@ class JobTimestampsUpdateTest extends AbstractTimestampUpdateTest {
     assertNotNull(job);
 
     // then
-    assertThat(job.getLockExpirationTime(), is(LOCK_EXP_TIME));
+    assertThat(job.getLockExpirationTime()).isEqualTo(LOCK_EXP_TIME);
   }
 }
