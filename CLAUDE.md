@@ -11,7 +11,7 @@ branch; upstream's `TESTING.md` and `CONTRIBUTING.md` are still accurate referen
 - Workspace layout and shared rules (upstream/downstream, never push, topic folders) are in `..\CLAUDE.md`.
 - This folder is a git worktree of `..\upstream` on the local branch **`2.2.2-orange`**, created from the upstream
   release tag **`v2.2.2`** (commit `76a6873d`), not from upstream `main`. The `origin` remote is upstream; fetch only.
-- Project version is **`2.2.2-orange.2`** (all POMs and `package.json` files). Change it only with
+- Project version is **`2.2.2-orange.3`** (all POMs and `package.json` files). Change it only with
   `.devenv/scripts/maintenance/set-project-version.sh <version>` from Git Bash, then run `.\mvnw.cmd validate`.
 - Upstream maintains `release/2.2.x` after 2.2.2. Check it (and `main`) for an existing fix before writing one.
 - Record every deviation from `v2.2.2` in `FORK-PATCHES.md` (reason, upstream issue, proving test, removal condition).
@@ -40,9 +40,9 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
 - `.mvn/maven.config` applies to every wrapper build: `-Duser.timezone=Europe/Berlin`,
   `-Djdk.xml.elementAttributeLimit=200` (required on Java 25 for `BpmnParseTest`), `--batch-mode`, and the Maven
   build cache disabled (opt in with `-Dmaven.build.cache.enabled=true`). Tests run in Europe/Berlin unless overridden.
-- `install` writes `org.operaton:*:2.2.2-orange.2` into `~/.m2/repository`, next to (not over) the released 2.2.2
+- `install` writes `org.operaton:*:2.2.2-orange.3` into `~/.m2/repository`, next to (not over) the released 2.2.2
   artifacts. Reproducers in `..\Review\reproducers` use released 2.2.2 by default; test a local build with
-  `'-Doperaton.version=2.2.2-orange.2'`.
+  `'-Doperaton.version=2.2.2-orange.3'`.
 - The WildFly modules (`distro/wildfly/*`, incl. the subsystem and its tests) are only in the reactor with the
   profile `distro-wildfly`, which is not active by default. Naming a profile explicitly switches off all
   `activeByDefault` profiles, including `distro`, which holds the normal module list. So: subsystem tests alone with
