@@ -219,6 +219,37 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   Testcontainers): fails without the fix (12 users instead of 2), passes with it.
 - **Drop when:** upstream restores the paging.
 
+### F-11: jobs of REST deployments run again after a restart (2026-11-21)
+
+- **Problem:** the shipped WildFly `standalone.xml` sets `jobExecutorDeploymentAware=true`. The job executor then
+  only acquires jobs of deployments registered in memory; process applications register theirs when they start,
+  but deployments made through REST (Modeler, Cockpit, scripts) are registered only when they are made. After a
+  restart their async jobs and timers never run (until the process is deployed again). Found in the deployment's
+  `test` stack.
+- **Added (engine):** `org.operaton.bpm.engine.impl.plugin.JobExecutorDeploymentRegistrationPlugin`, a process
+  engine plugin that, in `postProcessEngineBuild`, registers every deployment whose source is not
+  `process application` (paged, 500 per query); process application deployments stay with their application, so
+  their jobs run only with their classes. No-op when the job executor is not deployment-aware. Two log messages in
+  `JobExecutorLogger` (`ENGINE-14041`, `ENGINE-14042`). Not configured in the distribution's `standalone.xml`; the
+  deployment adds it to the engine's `<plugins>` (owner decision 2026-11-21: keep `deploymentAware=true` because
+  process-application WARs will be used too).
+- **Upstream:** no issue or PR; upstream's (and Camunda 7's) documented behaviour. Findings log:
+  `..\Review\FINDINGS.md` F-11.
+- **Test:** `JobExecutorDeploymentRegistrationPluginTest` (3 tests: Java-API, Modeler and process application
+  deployments after a simulated restart; no-op without deployment awareness; more than one page);
+  `DeploymentAwareJobExecutorTest` (9) and `ArchRulesTest` still green.
+- **Drop when:** upstream re-registers such deployments itself.
+
+### REST API requires authentication on WildFly (2026-11-21)
+
+- **Changed:** `engine-rest/assembly/src/main/runtime/wildfly/webapp/WEB-INF/web.xml` enables the
+  `ProcessEngineAuthenticationFilter` with `HttpBasicAuthenticationProvider` for `/*` (upstream ships it commented
+  out, so `/engine-rest` answers anyone who can reach the server). Only the WildFly REST WAR; the webapps (legacy and
+  neo) use their own session-protected engine API and are not affected.
+- **Why:** deployment requirement (topic 2, "REST authentication"); the archive is the only place to change the WAR.
+- **Test:** the deployment's level-1 tests (`..\Deployment`): 401 without credentials, 200 with an LDAP user.
+- **Drop when:** never as long as we ship the WildFly REST WAR; upstream will not change the default.
+
 ### Test: `QuerySessionFactoryTest` passes on Windows (2026-11-21)
 
 - **Changed (test only):** `webapps-neo/assembly` `QuerySessionFactoryTest.buildMappingsShouldBuildValidXml` expects
