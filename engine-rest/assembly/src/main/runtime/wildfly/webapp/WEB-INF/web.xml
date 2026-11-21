@@ -50,8 +50,10 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
-  <!-- Http Basic Authentication Filter -->
-  <!-- <filter>
+  <!-- Http Basic Authentication Filter
+       downstream: enabled (upstream ships it commented out, which leaves the REST API open to anyone who can reach
+       the server). Every request needs a user of the process engine's identity provider (LDAP in our deployment). -->
+  <filter>
     <filter-name>operaton-auth</filter-name>
     <filter-class>
       org.operaton.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter
@@ -66,6 +68,6 @@
   <filter-mapping>
     <filter-name>operaton-auth</filter-name>
     <url-pattern>/*</url-pattern>
-  </filter-mapping> -->
+  </filter-mapping>
 
 </web-app>
