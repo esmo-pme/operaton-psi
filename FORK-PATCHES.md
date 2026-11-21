@@ -204,3 +204,13 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   MSC pool): fails without the fix (thread group `main`), passes with it. Subsystem tests (28) green, with
   `-Pdistro-wildfly`.
 - **Drop when:** upstream wires the thread factory.
+
+### Test: `QuerySessionFactoryTest` passes on Windows (2026-11-21)
+
+- **Changed (test only):** `webapps-neo/assembly` `QuerySessionFactoryTest.buildMappingsShouldBuildValidXml` expects
+  each mapper line to end with `System.lineSeparator()` instead of `"\n"`. `QuerySessionFactory.buildMappings` ends
+  lines with `%n` (the platform line separator), so the test failed on Windows and passed on Linux. Production code
+  unchanged; the generated MyBatis XML is valid with either line ending.
+- **Upstream:** no issue or PR (own change; owner decision 2026-11-21). Findings log: `..\Review\FINDINGS.md` O-5.
+- **Test:** `webapps-neo/assembly`: 435 tests, 0 failures on Windows (before: 1 failure).
+- **Drop when:** upstream makes the test or the code platform-independent.

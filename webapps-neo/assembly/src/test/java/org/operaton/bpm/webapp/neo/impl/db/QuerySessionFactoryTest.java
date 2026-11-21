@@ -80,8 +80,10 @@ class QuerySessionFactoryTest {
     var document = builder.parse(new ByteArrayInputStream(mappings.getBytes()));
     assertThat(document.getDocumentElement().getNodeName()).isEqualTo("configuration");
 
+    // downstream: buildMappings ends each line with %n (the platform line separator), so expect that instead of a
+    // hard-coded "\n", which failed on Windows
     assertThat(mappings)
-      .contains("<mapper resource=\"foo/mapping1.xml\" />\n")
-      .contains("<mapper resource=\"bar/mapping2.xml\" />\n");
+      .contains("<mapper resource=\"foo/mapping1.xml\" />" + System.lineSeparator())
+      .contains("<mapper resource=\"bar/mapping2.xml\" />" + System.lineSeparator());
   }
 }
