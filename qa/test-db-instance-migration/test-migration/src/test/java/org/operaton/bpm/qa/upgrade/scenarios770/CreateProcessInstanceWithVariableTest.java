@@ -18,23 +18,23 @@ package org.operaton.bpm.qa.upgrade.scenarios770;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.history.HistoricVariableInstance;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ScenarioUnderTest("CreateProcessInstanceWithVariableScenario")
 @Origin("7.24.0")
 public class CreateProcessInstanceWithVariableTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initProcessInstance.1")
   @Test
@@ -42,8 +42,8 @@ public class CreateProcessInstanceWithVariableTest {
     // then
     ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().processInstanceBusinessKey("process").singleResult();
     List<HistoricVariableInstance> variables = engineRule.getHistoryService().createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(1, variables.size());
-    assertEquals("foo", variables.get(0).getName());
-    assertEquals("bar", variables.get(0).getValue());
+    assertThat(variables.size()).isEqualTo(1);
+    assertThat(variables.get(0).getName()).isEqualTo("foo");
+    assertThat(variables.get(0).getValue()).isEqualTo("bar");
   }
 }

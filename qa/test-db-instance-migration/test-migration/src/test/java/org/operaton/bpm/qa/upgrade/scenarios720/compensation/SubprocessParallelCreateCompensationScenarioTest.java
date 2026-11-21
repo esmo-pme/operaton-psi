@@ -16,14 +16,15 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.compensation;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thorben Lindhauer
@@ -33,8 +34,8 @@ import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
 @Origin("7.24.0")
 public class SubprocessParallelCreateCompensationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -55,18 +56,18 @@ public class SubprocessParallelCreateCompensationScenarioTest {
     rule.getTaskService().complete(beforeCompensationTask.getId());
 
     // then there is are two active compensation handler task
-    Assert.assertEquals(2, rule.taskQuery().count());
+    assertThat(rule.taskQuery().count()).isEqualTo(2);
     Task undoTask1 = rule.taskQuery().taskDefinitionKey("undoTask1").singleResult();
     Task undoTask2 = rule.taskQuery().taskDefinitionKey("undoTask2").singleResult();
-    Assert.assertNotNull(undoTask1);
-    Assert.assertNotNull(undoTask2);
+    assertThat(undoTask1).isNotNull();
+    assertThat(undoTask2).isNotNull();
 
     // and they can be completed such that the process instance ends successfully
     rule.getTaskService().complete(undoTask1.getId());
     rule.getTaskService().complete(undoTask2.getId());
 
     Task afterCompensateTask = rule.taskQuery().taskDefinitionKey("afterCompensate").singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
 
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
@@ -91,18 +92,18 @@ public class SubprocessParallelCreateCompensationScenarioTest {
     rule.getTaskService().complete(beforeCompensationTask.getId());
 
     // then there is are two active compensation handler task
-    Assert.assertEquals(2, rule.taskQuery().count());
+    assertThat(rule.taskQuery().count()).isEqualTo(2);
     Task undoTask1 = rule.taskQuery().taskDefinitionKey("undoTask1").singleResult();
     Task undoTask2 = rule.taskQuery().taskDefinitionKey("undoTask2").singleResult();
-    Assert.assertNotNull(undoTask2);
-    Assert.assertNotNull(undoTask1);
+    assertThat(undoTask2).isNotNull();
+    assertThat(undoTask1).isNotNull();
 
     // and they can be completed such that the process instance ends successfully
     rule.getTaskService().complete(undoTask1.getId());
     rule.getTaskService().complete(undoTask2.getId());
 
     Task afterCompensateTask = rule.taskQuery().taskDefinitionKey("afterCompensate").singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
 
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();

@@ -16,8 +16,6 @@
  */
 package org.operaton.bpm.container.impl.jboss.test;
 
-import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
-
 import org.operaton.bpm.container.impl.jboss.extension.BpmPlatformExtension;
 import org.operaton.bpm.container.impl.jboss.extension.ModelConstants;
 
@@ -25,7 +23,7 @@ import org.operaton.bpm.container.impl.jboss.extension.ModelConstants;
 /**
  * @author Christian Lipphardt
  */
-public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
+public class BpmPlatformSubsystemTest extends AbstractJupiterSubsystemBaseTest {
 
   public BpmPlatformSubsystemTest() {
     super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension());

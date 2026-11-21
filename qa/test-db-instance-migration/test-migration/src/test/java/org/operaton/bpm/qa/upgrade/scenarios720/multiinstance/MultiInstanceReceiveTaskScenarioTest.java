@@ -16,22 +16,22 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.multiinstance;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.migration.MigrationPlan;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 
 @ScenarioUnderTest("MultiInstanceReceiveTaskScenario")
 @Origin("7.24.0")
 public class MultiInstanceReceiveTaskScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("initParallel.1")
@@ -57,7 +57,7 @@ public class MultiInstanceReceiveTaskScenarioTest {
   }
 
   @Test
-  @Ignore("CAM-6408")
+  @Disabled("CAM-6408")
   @ScenarioUnderTest("initParallel.4")
   public void testInitParallelMigration() {
     // given
@@ -103,7 +103,7 @@ public class MultiInstanceReceiveTaskScenarioTest {
   }
 
   @Test
-  @Ignore("CAM-6408")
+  @Disabled("CAM-6408")
   @ScenarioUnderTest("initSequential.4")
   public void testInitSequentialMigration() {
     // given

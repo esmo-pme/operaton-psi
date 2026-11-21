@@ -53,7 +53,7 @@ import org.operaton.bpm.model.bpmn.BpmnModelInstance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assume.assumeNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * @author Daniel Meyer
@@ -1137,8 +1137,8 @@ class ProcessApplicationDeploymentTest {
     ProcessDefinition latestProcessDefinition = deployment2.getDeployedProcessDefinitions().get(0);
 
     // assume
-    assumeNotNull(managementService.getProcessApplicationForDeployment(deployment1.getId()));
-    assumeNotNull(managementService.getProcessApplicationForDeployment(deployment2.getId()));
+    assumeTrue(managementService.getProcessApplicationForDeployment(deployment1.getId()) != null);
+    assumeTrue(managementService.getProcessApplicationForDeployment(deployment2.getId()) != null);
 
     // delete latest process definition
     repositoryService.deleteProcessDefinition(latestProcessDefinition.getId());

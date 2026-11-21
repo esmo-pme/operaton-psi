@@ -30,7 +30,7 @@ import org.operaton.bpm.engine.management.Metrics;
 import org.operaton.bpm.engine.management.MetricsQuery;
 
 import static org.operaton.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

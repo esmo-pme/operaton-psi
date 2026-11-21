@@ -18,9 +18,8 @@ package org.operaton.bpm.qa.upgrade.scenarios720.job;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.management.JobDefinition;
 import org.operaton.bpm.engine.runtime.Job;
@@ -28,14 +27,16 @@ import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ScenarioUnderTest("AsyncParallelMultiInstanceScenario")
 @Origin("7.24.0")
 public class AsyncParallelMultiInstanceScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("initAsyncBeforeSubprocess.1")
@@ -48,7 +49,7 @@ public class AsyncParallelMultiInstanceScenarioTest {
 
     // then the process can be completed successfully
     List<Task> subProcessTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, subProcessTasks.size());
+    assertThat(subProcessTasks.size()).isEqualTo(3);
 
     for (Task subProcessTask : subProcessTasks) {
       rule.getTaskService().complete(subProcessTask.getId());
@@ -83,7 +84,7 @@ public class AsyncParallelMultiInstanceScenarioTest {
 
     // then the old job definition referencing "miSubProcess" has been migrated
     JobDefinition asyncJobDefinition = rule.jobDefinitionQuery().singleResult();
-    Assert.assertEquals("miSubProcess#multiInstanceBody", asyncJobDefinition.getActivityId());
+    assertThat(asyncJobDefinition.getActivityId()).isEqualTo("miSubProcess#multiInstanceBody");
   }
 
   @Test
@@ -97,7 +98,7 @@ public class AsyncParallelMultiInstanceScenarioTest {
 
     // then the process can be completed successfully
     List<Task> subProcessTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, subProcessTasks.size());
+    assertThat(subProcessTasks.size()).isEqualTo(3);
 
     for (Task subProcessTask : subProcessTasks) {
       rule.getTaskService().complete(subProcessTask.getId());
@@ -132,7 +133,7 @@ public class AsyncParallelMultiInstanceScenarioTest {
 
     // then the old job definition referencing "miSubProcess" has been migrated
     JobDefinition asyncJobDefinition = rule.jobDefinitionQuery().singleResult();
-    Assert.assertEquals("miTask#multiInstanceBody", asyncJobDefinition.getActivityId());
+    assertThat(asyncJobDefinition.getActivityId()).isEqualTo("miTask#multiInstanceBody");
   }
 
 }

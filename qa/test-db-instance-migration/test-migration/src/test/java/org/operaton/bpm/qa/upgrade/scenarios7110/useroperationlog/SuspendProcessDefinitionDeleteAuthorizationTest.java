@@ -20,10 +20,10 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.useroperationlog;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.AuthorizationException;
 import org.operaton.bpm.engine.AuthorizationService;
@@ -34,14 +34,12 @@ import org.operaton.bpm.engine.authorization.Resources;
 import org.operaton.bpm.engine.history.UserOperationLogEntry;
 import org.operaton.bpm.engine.history.UserOperationLogQuery;
 import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.operaton.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.operaton.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Yana.Vasileva
@@ -51,14 +49,14 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
 
   private static final String USER_ID = "jane" + "SuspendProcessDefinitionDelete";
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   protected HistoryService historyService;
   protected AuthorizationService authorizationService;
   protected ProcessEngineConfigurationImpl engineConfiguration;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     historyService = engineRule.getHistoryService();
     authorizationService = engineRule.getAuthorizationService();
@@ -67,7 +65,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
     engineRule.getIdentityService().clearAuthentication();
@@ -86,7 +84,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
         .afterTimestamp(new Date(1549110000000L));
 
     // assume
-    assertEquals(1L, query.count());
+    assertThat(query.count()).isEqualTo(1L);
     UserOperationLogEntry entry = query.singleResult();
 
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
@@ -115,7 +113,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
         .beforeTimestamp(new Date(1549110000000L));
 
     // assume
-    assertTrue(query.count() == 1 || query.count() == 2);
+    assertThat(query.count() == 1 || query.count() == 2).isTrue();
 
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
     auth.setUserId(USER_ID);
@@ -132,7 +130,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     historyService.deleteUserOperationLogEntry(logId);
 
     // then
-    assertEquals(0, query.processInstanceId(processInstanceId).count());
+    assertThat(query.processInstanceId(processInstanceId).count()).isEqualTo(0);
   }
 
   @Test
@@ -143,7 +141,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
         .beforeTimestamp(new Date(1549110000000L));
 
     // assume
-    assertTrue(query.count() == 1 || query.count() == 2);
+    assertThat(query.count() == 1 || query.count() == 2).isTrue();
 
     String logId = query.list().get(0).getId();
     String processInstanceId = query.list().get(0).getProcessInstanceId();
@@ -161,6 +159,6 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     historyService.deleteUserOperationLogEntry(logId);
 
     // then
-    assertEquals(0, query.processInstanceId(processInstanceId).count());
+    assertThat(query.processInstanceId(processInstanceId).count()).isEqualTo(0);
   }
 }

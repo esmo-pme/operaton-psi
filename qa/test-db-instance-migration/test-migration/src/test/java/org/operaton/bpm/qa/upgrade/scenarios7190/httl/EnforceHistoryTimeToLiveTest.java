@@ -17,9 +17,9 @@
 
 package org.operaton.bpm.qa.upgrade.scenarios7190.httl;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.ManagementService;
 import org.operaton.bpm.engine.RepositoryService;
@@ -30,7 +30,7 @@ import org.operaton.bpm.engine.repository.DecisionDefinition;
 import org.operaton.bpm.engine.repository.ProcessDefinition;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -43,8 +43,8 @@ public class EnforceHistoryTimeToLiveTest {
   private static final String SCENARIO_DECISION = "decisionWithoutHTTL";
   private static final String SCENARIO_CASE = "caseWithoutHTTL";
 
-  @Rule
-  public final UpgradeTestRule engineRule = new UpgradeTestRule();
+  @RegisterExtension
+  public final UpgradeTestExtension engineRule = new UpgradeTestExtension();
 
   ManagementService managementService;
   RuntimeService runtimeService;
@@ -52,7 +52,7 @@ public class EnforceHistoryTimeToLiveTest {
   RepositoryService repositoryService;
 
 
-  @Before
+  @BeforeEach
   public void assignServices() {
     managementService = engineRule.getManagementService();
     runtimeService = engineRule.getRuntimeService();

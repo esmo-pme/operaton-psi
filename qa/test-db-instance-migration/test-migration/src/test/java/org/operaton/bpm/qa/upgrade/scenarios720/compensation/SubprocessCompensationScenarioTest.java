@@ -16,17 +16,17 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.compensation;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ActivityInstance;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.assertThat;
 import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
@@ -38,8 +38,8 @@ import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeAc
 @Origin("7.24.0")
 public class SubprocessCompensationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -50,15 +50,15 @@ public class SubprocessCompensationScenarioTest {
 
     // then there is an active compensation handler task
     Task compensationHandlerTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(compensationHandlerTask);
-    Assert.assertEquals("undoTask", compensationHandlerTask.getTaskDefinitionKey());
+    assertThat(compensationHandlerTask).isNotNull();
+    assertThat(compensationHandlerTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
     // and it can be completed such that the process instance ends successfully
     rule.getTaskService().complete(compensationHandlerTask.getId());
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
-    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+    assertThat(afterCompensateTask).isNotNull();
+    assertThat(afterCompensateTask.getTaskDefinitionKey()).isEqualTo("afterCompensate");
 
     rule.getTaskService().complete(afterCompensateTask.getId());
 
@@ -91,7 +91,7 @@ public class SubprocessCompensationScenarioTest {
 
     // then the activity instance tree is meaningful
     ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
-    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).isNotNull();
     assertThat(activityInstance).hasStructure(
       describeActivityInstanceTree(instance.getProcessDefinitionId())
         .activity("throwCompensate")
@@ -110,8 +110,8 @@ public class SubprocessCompensationScenarioTest {
     rule.getTaskService().complete(compensationHandlerTask.getId());
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
-    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+    assertThat(afterCompensateTask).isNotNull();
+    assertThat(afterCompensateTask.getTaskDefinitionKey()).isEqualTo("afterCompensate");
 
     rule.getTaskService().complete(afterCompensateTask.getId());
 
@@ -138,20 +138,20 @@ public class SubprocessCompensationScenarioTest {
     rule.getTaskService().complete(beforeCompensationTask.getId());
 
     // then there are two active compensation handler task
-    Assert.assertEquals(2, rule.taskQuery().count());
+    assertThat(rule.taskQuery().count()).isEqualTo(2);
     Task undoTask1 = rule.taskQuery().taskDefinitionKey("undoTask1").singleResult();
-    Assert.assertNotNull(undoTask1);
+    assertThat(undoTask1).isNotNull();
 
     Task undoTask2 = rule.taskQuery().taskDefinitionKey("undoTask2").singleResult();
-    Assert.assertNotNull(undoTask2);
+    assertThat(undoTask2).isNotNull();
 
     // and they can be completed such that the process instance ends successfully
     rule.getTaskService().complete(undoTask1.getId());
     rule.getTaskService().complete(undoTask2.getId());
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
-    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+    assertThat(afterCompensateTask).isNotNull();
+    assertThat(afterCompensateTask.getTaskDefinitionKey()).isEqualTo("afterCompensate");
 
     rule.getTaskService().complete(afterCompensateTask.getId());
 
@@ -184,7 +184,7 @@ public class SubprocessCompensationScenarioTest {
 
     // then the activity instance tree is meaningful
     ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
-    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).isNotNull();
     assertThat(activityInstance).hasStructure(
       describeActivityInstanceTree(instance.getProcessDefinitionId())
         .activity("throwCompensate")
@@ -206,8 +206,8 @@ public class SubprocessCompensationScenarioTest {
     rule.getTaskService().complete(undoTask2.getId());
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
-    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+    assertThat(afterCompensateTask).isNotNull();
+    assertThat(afterCompensateTask.getTaskDefinitionKey()).isEqualTo("afterCompensate");
 
     rule.getTaskService().complete(afterCompensateTask.getId());
 

@@ -33,7 +33,6 @@ import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.engine.test.RequiredHistoryLevel;
 import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameter;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameterized;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameters;
@@ -78,7 +77,7 @@ public class StandaloneTaskAuthorizationTest {
 
   @Parameters
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
+    return AuthorizationTestExtension.asParameters(
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(

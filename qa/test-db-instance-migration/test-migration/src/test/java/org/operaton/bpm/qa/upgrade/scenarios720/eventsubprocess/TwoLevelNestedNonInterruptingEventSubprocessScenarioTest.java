@@ -18,18 +18,18 @@ package org.operaton.bpm.qa.upgrade.scenarios720.eventsubprocess;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate.ThrowBpmnErrorDelegateException;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -40,8 +40,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Origin("7.24.0")
 public class TwoLevelNestedNonInterruptingEventSubprocessScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("initLevel1.1")
@@ -84,10 +84,10 @@ public class TwoLevelNestedNonInterruptingEventSubprocessScenarioTest {
     rule.messageCorrelation("InnerEventSubProcessMessage").correlate();
 
     // then
-    Assert.assertEquals(3, rule.taskQuery().count());
+    assertThat(rule.taskQuery().count()).isEqualTo(3);
 
     Task innerEventSubprocessTask = rule.taskQuery().taskDefinitionKey("innerEventSubProcessTask").singleResult();
-    Assert.assertNotNull(innerEventSubprocessTask);
+    assertThat(innerEventSubprocessTask).isNotNull();
 
     // and
     rule.getTaskService().complete(innerTask.getId());
@@ -123,8 +123,8 @@ public class TwoLevelNestedNonInterruptingEventSubprocessScenarioTest {
 
     // then
     Task escalatedTask = rule.taskQuery().singleResult();
-    Assert.assertEquals("escalatedTask", escalatedTask.getTaskDefinitionKey());
-    Assert.assertNotNull(escalatedTask);
+    assertThat(escalatedTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
+    assertThat(escalatedTask).isNotNull();
 
     rule.getTaskService().complete(escalatedTask.getId());
     rule.assertScenarioEnded();
@@ -193,10 +193,10 @@ public class TwoLevelNestedNonInterruptingEventSubprocessScenarioTest {
     rule.messageCorrelation("InnerEventSubProcessMessage").correlate();
 
     // then
-    Assert.assertEquals(4, rule.taskQuery().count());
+    assertThat(rule.taskQuery().count()).isEqualTo(4);
 
     List<Task> innerEventSubprocessTasks = rule.taskQuery().taskDefinitionKey("innerEventSubProcessTask").list();
-    Assert.assertEquals(2, innerEventSubprocessTasks.size());
+    assertThat(innerEventSubprocessTasks.size()).isEqualTo(2);
 
     // and
     rule.getTaskService().complete(innerTask.getId());
@@ -232,8 +232,8 @@ public class TwoLevelNestedNonInterruptingEventSubprocessScenarioTest {
 
     // then
     Task escalatedTask = rule.taskQuery().singleResult();
-    Assert.assertEquals("escalatedTask", escalatedTask.getTaskDefinitionKey());
-    Assert.assertNotNull(escalatedTask);
+    assertThat(escalatedTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
+    assertThat(escalatedTask).isNotNull();
 
     rule.getTaskService().complete(escalatedTask.getId());
     rule.assertScenarioEnded();

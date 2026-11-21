@@ -34,7 +34,6 @@ import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.test.Deployment;
 import org.operaton.bpm.engine.test.RequiredHistoryLevel;
 import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameter;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameterized;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameters;
@@ -76,7 +75,7 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
 
   @Parameters
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
+    return AuthorizationTestExtension.asParameters(
         scenario()
             .failsDueToRequired(
                 grant(Resources.PROCESS_DEFINITION, "processDefinition", "demo", Permissions.DELETE_HISTORY)

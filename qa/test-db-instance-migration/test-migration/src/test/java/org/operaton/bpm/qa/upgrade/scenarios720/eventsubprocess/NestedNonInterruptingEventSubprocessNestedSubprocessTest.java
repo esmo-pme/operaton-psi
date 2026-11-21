@@ -16,26 +16,26 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.eventsubprocess;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate.ThrowBpmnErrorDelegateException;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ScenarioUnderTest("NestedNonInterruptingEventSubprocessNestedSubprocessScenario")
 @Origin("7.24.0")
 public class NestedNonInterruptingEventSubprocessNestedSubprocessTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -50,7 +50,7 @@ public class NestedNonInterruptingEventSubprocessNestedSubprocessTest {
 
     // then
     Task innerSubprocessTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(innerSubprocessTask);
+    assertThat(innerSubprocessTask).isNotNull();
     rule.getTaskService().complete(innerSubprocessTask.getId());
 
     // and
@@ -70,7 +70,7 @@ public class NestedNonInterruptingEventSubprocessNestedSubprocessTest {
 
     // then
     Task innerSubprocessTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(innerSubprocessTask);
+    assertThat(innerSubprocessTask).isNotNull();
     rule.getTaskService().complete(innerSubprocessTask.getId());
 
     // and
@@ -103,13 +103,13 @@ public class NestedNonInterruptingEventSubprocessNestedSubprocessTest {
     // and
     rule.getRuntimeService().setVariable(instance.getId(), ThrowBpmnErrorDelegate.ERROR_INDICATOR_VARIABLE, true);
     Task innerSubProcessTask = rule.taskQuery().taskDefinitionKey("innerSubProcessTask").singleResult();
-    Assert.assertNotNull(innerSubProcessTask);
+    assertThat(innerSubProcessTask).isNotNull();
     rule.getTaskService().complete(innerSubProcessTask.getId());
 
     // then
     Task afterErrorTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterErrorTask);
-    Assert.assertEquals("escalatedTask", afterErrorTask.getTaskDefinitionKey());
+    assertThat(afterErrorTask).isNotNull();
+    assertThat(afterErrorTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
 
     // and
     rule.getTaskService().complete(afterErrorTask.getId());
@@ -130,7 +130,7 @@ public class NestedNonInterruptingEventSubprocessNestedSubprocessTest {
     rule.getRuntimeService().setVariable(instance.getId(), ThrowBpmnErrorDelegate.EXCEPTION_INDICATOR_VARIABLE, true);
     rule.getRuntimeService().setVariable(instance.getId(), ThrowBpmnErrorDelegate.EXCEPTION_MESSAGE_VARIABLE, "unhandledException");
     Task innerSubProcessTask = rule.taskQuery().taskDefinitionKey("innerSubProcessTask").singleResult();
-    Assert.assertNotNull(innerSubProcessTask);
+    assertThat(innerSubProcessTask).isNotNull();
 
     // when/then
     assertThatThrownBy(() -> rule.getTaskService().complete(innerSubProcessTask.getId()))
@@ -194,8 +194,8 @@ public class NestedNonInterruptingEventSubprocessNestedSubprocessTest {
 
     // then
     Task afterErrorTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterErrorTask);
-    Assert.assertEquals("escalatedTask", afterErrorTask.getTaskDefinitionKey());
+    assertThat(afterErrorTask).isNotNull();
+    assertThat(afterErrorTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
 
     // and
     rule.getTaskService().complete(afterErrorTask.getId());

@@ -22,7 +22,6 @@ import org.operaton.bpm.engine.ProcessEngineException;
 import org.operaton.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.operaton.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.operaton.bpm.engine.runtime.Job;
-import org.operaton.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.operaton.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
 import org.operaton.bpm.engine.test.junit5.migration.MigrationTestExtension;
 import org.operaton.bpm.model.bpmn.BpmnModelInstance;
@@ -87,11 +86,6 @@ public class TimerEventFactory implements BpmnEventFactory {
       }
 
       managementService.executeJob(timerJob.getId());
-    }
-
-    @Override
-    public void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId) {
-      migrationContext.assertJobMigrated(activityId, targetActivityId, handlerType);
     }
 
     @Override

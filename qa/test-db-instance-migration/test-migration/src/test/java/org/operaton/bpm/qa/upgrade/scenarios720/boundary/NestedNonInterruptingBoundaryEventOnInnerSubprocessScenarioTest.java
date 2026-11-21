@@ -18,9 +18,8 @@ package org.operaton.bpm.qa.upgrade.scenarios720.boundary;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ActivityInstance;
 import org.operaton.bpm.engine.runtime.Job;
@@ -28,7 +27,7 @@ import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate.ThrowBpmnErrorDelegateException;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate;
 
@@ -41,8 +40,8 @@ import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeAc
 @Origin("7.24.0")
 public class NestedNonInterruptingBoundaryEventOnInnerSubprocessScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("initTimer.1")
@@ -82,7 +81,7 @@ public class NestedNonInterruptingBoundaryEventOnInnerSubprocessScenarioTest {
     ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
 
     // then
-    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).isNotNull();
     assertThat(activityInstance).hasStructure(
         describeActivityInstanceTree(instance.getProcessDefinitionId())
         .beginScope("outerSubProcess")
@@ -120,7 +119,7 @@ public class NestedNonInterruptingBoundaryEventOnInnerSubprocessScenarioTest {
 
     // and the tasks are completed
     List<Task> afterBoundaryTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, afterBoundaryTasks.size());
+    assertThat(afterBoundaryTasks.size()).isEqualTo(3);
 
     for (Task afterBoundaryTask : afterBoundaryTasks) {
       rule.getTaskService().complete(afterBoundaryTask.getId());
@@ -144,8 +143,8 @@ public class NestedNonInterruptingBoundaryEventOnInnerSubprocessScenarioTest {
 
     // then
     Task afterErrorTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterErrorTask);
-    Assert.assertEquals("escalatedTask", afterErrorTask.getTaskDefinitionKey());
+    assertThat(afterErrorTask).isNotNull();
+    assertThat(afterErrorTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
 
     // and
     rule.getTaskService().complete(afterErrorTask.getId());
@@ -208,7 +207,7 @@ public class NestedNonInterruptingBoundaryEventOnInnerSubprocessScenarioTest {
     ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
 
     // then
-    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).isNotNull();
     assertThat(activityInstance).hasStructure(
         describeActivityInstanceTree(instance.getProcessDefinitionId())
         .beginScope("outerSubProcess")
@@ -241,7 +240,7 @@ public class NestedNonInterruptingBoundaryEventOnInnerSubprocessScenarioTest {
 
     // and the tasks are completed
     List<Task> afterBoundaryTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, afterBoundaryTasks.size());
+    assertThat(afterBoundaryTasks.size()).isEqualTo(3);
 
     for (Task afterBoundaryTask : afterBoundaryTasks) {
       rule.getTaskService().complete(afterBoundaryTask.getId());
@@ -265,8 +264,8 @@ public class NestedNonInterruptingBoundaryEventOnInnerSubprocessScenarioTest {
 
     // then
     Task afterErrorTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterErrorTask);
-    Assert.assertEquals("escalatedTask", afterErrorTask.getTaskDefinitionKey());
+    assertThat(afterErrorTask).isNotNull();
+    assertThat(afterErrorTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
 
     // and
     rule.getTaskService().complete(afterErrorTask.getId());

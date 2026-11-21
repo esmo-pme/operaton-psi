@@ -19,18 +19,16 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.FilterService;
 import org.operaton.bpm.engine.filter.Filter;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -39,8 +37,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Origin("7.24.0")
 public class TaskFilterPropertiesTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initTaskFilterProperties.1")
   @Test
@@ -56,14 +54,14 @@ public class TaskFilterPropertiesTest {
     Map map = (Map) list.get(0);
 
     // then
-    assertThat(deserialisedProperties.size(), is(1));
-    assertThat((String) map.get("string"), is("aStringValue"));
-    assertThat((int) map.get("int"), is(47));
-    assertThat((long) map.get("intOutOfRange"), is(Integer.MAX_VALUE + 1L));
-    assertThat((long) map.get("long"), is(Long.MAX_VALUE));
-    assertThat((double) map.get("double"), is(3.14159265359D));
-    assertThat((boolean) map.get("boolean"), is(true));
-    assertThat(map.get("null"), nullValue());
+    assertThat(deserialisedProperties.size()).isEqualTo(1);
+    assertThat((String) map.get("string")).isEqualTo("aStringValue");
+    assertThat((int) map.get("int")).isEqualTo(47);
+    assertThat((long) map.get("intOutOfRange")).isEqualTo(Integer.MAX_VALUE + 1L);
+    assertThat((long) map.get("long")).isEqualTo(Long.MAX_VALUE);
+    assertThat((double) map.get("double")).isEqualTo(3.14159265359D);
+    assertThat((boolean) map.get("boolean")).isEqualTo(true);
+    assertThat(map.get("null")).isNull();
   }
 
   @ScenarioUnderTest("initTaskFilterProperties.1")
@@ -79,15 +77,15 @@ public class TaskFilterPropertiesTest {
     List list = (List) ((Map) deserialisedProperties.get("foo")).get("bar");
 
     // then
-    assertThat(deserialisedProperties.size(), is(1));
+    assertThat(deserialisedProperties.size()).isEqualTo(1);
 
-    assertThat((String) list.get(0), is("aStringValue"));
-    assertThat((int) list.get(1), is(47));
-    assertThat((long) list.get(2), is(Integer.MAX_VALUE + 1L));
-    assertThat((long) list.get(3), is(Long.MAX_VALUE));
-    assertThat((double) list.get(4), is(3.14159265359D));
-    assertThat((boolean) list.get(5), is(true));
-    assertThat(list.get(6), nullValue());
+    assertThat((String) list.get(0)).isEqualTo("aStringValue");
+    assertThat((int) list.get(1)).isEqualTo(47);
+    assertThat((long) list.get(2)).isEqualTo(Integer.MAX_VALUE + 1L);
+    assertThat((long) list.get(3)).isEqualTo(Long.MAX_VALUE);
+    assertThat((double) list.get(4)).isEqualTo(3.14159265359D);
+    assertThat((boolean) list.get(5)).isEqualTo(true);
+    assertThat(list.get(6)).isNull();
   }
 
 }

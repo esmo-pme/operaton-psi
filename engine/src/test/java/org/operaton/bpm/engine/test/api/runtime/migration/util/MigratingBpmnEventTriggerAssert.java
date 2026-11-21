@@ -16,7 +16,6 @@
  */
 package org.operaton.bpm.engine.test.api.runtime.migration.util;
 
-import org.operaton.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.operaton.bpm.engine.test.junit5.migration.MigrationTestExtension;
 
 /**
@@ -25,6 +24,5 @@ import org.operaton.bpm.engine.test.junit5.migration.MigrationTestExtension;
  */
 public interface MigratingBpmnEventTriggerAssert {
 
-  void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId);
   void assertEventTriggerMigrated(MigrationTestExtension migrationContext, String targetActivityId);
 }

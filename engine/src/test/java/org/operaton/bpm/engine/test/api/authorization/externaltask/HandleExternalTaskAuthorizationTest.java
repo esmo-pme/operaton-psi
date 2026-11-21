@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.operaton.bpm.engine.authorization.Permissions;
 import org.operaton.bpm.engine.authorization.Resources;
 import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameter;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameters;
 import org.operaton.bpm.engine.test.junit5.ProcessEngineExtension;
@@ -49,7 +48,7 @@ public abstract class HandleExternalTaskAuthorizationTest {
 
   @Parameters
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
+    return AuthorizationTestExtension.asParameters(
         scenario()
             .withoutAuthorizations()
             .failsDueToRequired(

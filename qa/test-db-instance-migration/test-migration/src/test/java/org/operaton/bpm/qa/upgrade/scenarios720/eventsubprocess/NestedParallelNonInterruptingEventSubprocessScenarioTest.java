@@ -16,26 +16,26 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.eventsubprocess;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate.ThrowBpmnErrorDelegateException;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ScenarioUnderTest("NestedParallelNonInterruptingEventSubprocessScenario")
 @Origin("7.24.0")
 public class NestedParallelNonInterruptingEventSubprocessScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -97,8 +97,8 @@ public class NestedParallelNonInterruptingEventSubprocessScenarioTest {
 
     // then
     Task escalatedTask = rule.taskQuery().singleResult();
-    Assert.assertEquals("escalatedTask", escalatedTask.getTaskDefinitionKey());
-    Assert.assertNotNull(escalatedTask);
+    assertThat(escalatedTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
+    assertThat(escalatedTask).isNotNull();
 
     rule.getTaskService().complete(escalatedTask.getId());
     rule.assertScenarioEnded();
@@ -162,8 +162,8 @@ public class NestedParallelNonInterruptingEventSubprocessScenarioTest {
 
     // then
     Task escalatedTask = rule.taskQuery().singleResult();
-    Assert.assertEquals("escalatedTask", escalatedTask.getTaskDefinitionKey());
-    Assert.assertNotNull(escalatedTask);
+    assertThat(escalatedTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
+    assertThat(escalatedTask).isNotNull();
 
     rule.getTaskService().complete(escalatedTask.getId());
     rule.assertScenarioEnded();

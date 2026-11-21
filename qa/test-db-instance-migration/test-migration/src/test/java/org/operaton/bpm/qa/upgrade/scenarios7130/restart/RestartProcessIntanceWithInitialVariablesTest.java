@@ -18,9 +18,9 @@ package org.operaton.bpm.qa.upgrade.scenarios7130.restart;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.HistoryService;
 import org.operaton.bpm.engine.ManagementService;
@@ -30,22 +30,20 @@ import org.operaton.bpm.engine.impl.history.event.HistoricVariableUpdateEventEnt
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.runtime.VariableInstance;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.operaton.bpm.engine.impl.test.TestHelper.executeJobIgnoringException;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class RestartProcessIntanceWithInitialVariablesTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   RuntimeService runtimeService;
   HistoryService historyService;
 
-  @Before
+  @BeforeEach
   public void assignServices() {
     runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
@@ -58,7 +56,7 @@ public class RestartProcessIntanceWithInitialVariablesTest {
     ProcessInstance processInstanceWithInitialVariables = runtimeService.createProcessInstanceQuery()
         .processInstanceBusinessKey(businessKey)
         .singleResult();
-    assertNotNull(processInstanceWithInitialVariables);
+    assertThat(processInstanceWithInitialVariables).isNotNull();
 
     runtimeService.deleteProcessInstance(processInstanceWithInitialVariables.getId(), "test");
     // when
@@ -79,26 +77,26 @@ public class RestartProcessIntanceWithInitialVariablesTest {
         .active()
         .singleResult();
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
-    assertEquals(1, variables.size());
-    assertEquals("initial1", variables.get(0).getName());
-    assertEquals("value1", variables.get(0).getValue());
+    assertThat(variables.size()).isEqualTo(1);
+    assertThat(variables.get(0).getName()).isEqualTo("initial1");
+    assertThat(variables.get(0).getValue()).isEqualTo("value1");
     List<HistoricVariableInstance> list = historyService.createHistoricVariableInstanceQuery()
         .processInstanceId(restartedProcessInstance.getId())
         .list();
 
-    assertEquals(1, list.size());
+    assertThat(list.size()).isEqualTo(1);
     HistoricVariableInstance historicVariableInstance = list.get(0);
-    assertEquals(restartedProcessInstance.getId(), historicVariableInstance.getActivityInstanceId());
-    assertEquals("initial1", variables.get(0).getName());
-    assertEquals("value1", variables.get(0).getValue());
+    assertThat(historicVariableInstance.getActivityInstanceId()).isEqualTo(restartedProcessInstance.getId());
+    assertThat(variables.get(0).getName()).isEqualTo("initial1");
+    assertThat(variables.get(0).getValue()).isEqualTo("value1");
 
     HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historyService.createHistoricDetailQuery()
         .processInstanceId(restartedProcessInstance.getId())
         .singleResult();
-    assertNotNull(detail);
-    assertTrue(detail.isInitial());
-    assertEquals("initial1", detail.getVariableName());
-    assertEquals("value1", detail.getTextValue());
+    assertThat(detail).isNotNull();
+    assertThat(detail.isInitial()).isTrue();
+    assertThat(detail.getVariableName()).isEqualTo("initial1");
+    assertThat(detail.getTextValue()).isEqualTo("value1");
   }
 
   @Test
@@ -125,7 +123,7 @@ public class RestartProcessIntanceWithInitialVariablesTest {
         .activityInstanceId(processInstanceWithInitialVariables.getId())
         .singleResult();
 
-    assertTrue(detail.isInitial());
+    assertThat(detail.isInitial()).isTrue();
 
     runtimeService.deleteProcessInstance(processInstanceWithInitialVariables.getId(), "test");
 
@@ -144,20 +142,20 @@ public class RestartProcessIntanceWithInitialVariablesTest {
     // then
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(restartedProcessInstance.getId()).singleResult();
-    assertNotNull(variableInstance);
-    assertEquals("initial3", variableInstance.getName());
-    assertEquals("value1", variableInstance.getValue());
+    assertThat(variableInstance).isNotNull();
+    assertThat(variableInstance.getName()).isEqualTo("initial3");
+    assertThat(variableInstance.getValue()).isEqualTo("value1");
 
     HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery()
         .processInstanceId(restartedProcessInstance.getId())
         .singleResult();
-    assertNotNull(historicVariable);
-    assertEquals(restartedProcessInstance.getId(), historicVariable.getActivityInstanceId());
+    assertThat(historicVariable).isNotNull();
+    assertThat(historicVariable.getActivityInstanceId()).isEqualTo(restartedProcessInstance.getId());
 
     detail = (HistoricVariableUpdateEventEntity) historyService.createHistoricDetailQuery()
         .processInstanceId(restartedProcessInstance.getId())
         .singleResult();
 
-    assertTrue(detail.isInitial());
+    assertThat(detail.isInitial()).isTrue();
   }
 }

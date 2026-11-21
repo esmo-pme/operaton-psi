@@ -18,17 +18,16 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson.batch;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.batch.Batch;
 import org.operaton.bpm.engine.runtime.Job;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -37,8 +36,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Origin("7.24.0")
 public class SetJobRetriesBatchTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initSetJobRetriesBatch.1")
   @Test
@@ -49,9 +48,9 @@ public class SetJobRetriesBatchTest {
       .list();
 
     // assume
-    assertThat(jobs.size(), is(10));
+    assertThat(jobs.size()).isEqualTo(10);
     for (Job job : jobs) {
-      assertThat(job.getRetries(), is(3));
+      assertThat(job.getRetries()).isEqualTo(3);
     }
 
     String batchId = engineRule.getManagementService().getProperties().get("SetJobRetriesBatchScenario.retries.batchId");
@@ -84,7 +83,7 @@ public class SetJobRetriesBatchTest {
 
     // then
     for (Job job : jobs) {
-      assertThat(job.getRetries(), is(22));
+      assertThat(job.getRetries()).isEqualTo(22);
     }
   }
 

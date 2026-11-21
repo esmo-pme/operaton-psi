@@ -18,18 +18,17 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson.batch;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.batch.Batch;
 import org.operaton.bpm.engine.history.HistoricDecisionInstance;
 import org.operaton.bpm.engine.runtime.Job;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -38,8 +37,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Origin("7.24.0")
 public class DeleteHistoricDecisionsBatchTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initDeleteHistoricDecisionsBatch.1")
   @Test
@@ -50,7 +49,7 @@ public class DeleteHistoricDecisionsBatchTest {
       .list();
 
     // assume
-    assertThat(historicDecisionInstances.size(), is(10));
+    assertThat(historicDecisionInstances.size()).isEqualTo(10);
 
     Batch batch = engineRule.getManagementService().createBatchQuery()
       .type(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION)
@@ -77,7 +76,7 @@ public class DeleteHistoricDecisionsBatchTest {
       .list();
 
     // then
-    assertThat(historicDecisionInstances.size(), is(0));
+    assertThat(historicDecisionInstances.size()).isEqualTo(0);
   }
 
 }

@@ -16,16 +16,16 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.compensation;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ActivityInstance;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.assertThat;
 import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
@@ -37,8 +37,8 @@ import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeAc
 @Origin("7.24.0")
 public class SingleActivityCompensationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.triggerCompensation.3")
@@ -48,7 +48,7 @@ public class SingleActivityCompensationScenarioTest {
 
     // then the activity instance tree is meaningful
     ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
-    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).isNotNull();
     assertThat(activityInstance).hasStructure(
         describeActivityInstanceTree(instance.getProcessDefinitionId())
           .activity("throwCompensate")

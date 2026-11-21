@@ -19,7 +19,7 @@ package org.operaton.bpm.engine.test.api.authorization.task.getvariable;
 import java.util.Collection;
 
 import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.operaton.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
+import org.operaton.bpm.engine.test.junit5.authorization.AuthorizationTestExtension;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameterized;
 import org.operaton.bpm.engine.test.junit5.ParameterizedTestExtension.Parameters;
 
@@ -39,7 +39,7 @@ public class ProcessTaskReadPermissionAuthorizationTest extends ProcessTaskAutho
 
   @Parameters
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
+    return AuthorizationTestExtension.asParameters(
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(

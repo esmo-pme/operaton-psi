@@ -22,8 +22,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.rules.TemporaryFolder;
-
 import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.operaton.bpm.engine.repository.OperatonFormDefinition;
 import org.operaton.bpm.engine.test.form.deployment.FindOperatonFormDefinitionsCmd;
@@ -33,10 +31,6 @@ public final class OperatonFormUtils {
   public static List<OperatonFormDefinition> findAllOperatonFormDefinitionEntities(ProcessEngineConfigurationImpl config) {
     return config.getCommandExecutorTxRequired()
         .execute(new FindOperatonFormDefinitionsCmd());
-  }
-
-  public static FileInputStream writeTempFormFile(String fileName, String content, TemporaryFolder tempFolder) throws IOException {
-    return writeTempFormFile(fileName, content, tempFolder.getRoot());
   }
 
   public static FileInputStream writeTempFormFile(String fileName, String content, File tempFolder) throws IOException {

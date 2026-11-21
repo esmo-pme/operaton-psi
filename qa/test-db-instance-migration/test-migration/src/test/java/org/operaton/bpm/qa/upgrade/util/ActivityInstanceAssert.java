@@ -21,11 +21,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-import org.junit.Assert;
-
 import org.operaton.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.operaton.bpm.engine.runtime.ActivityInstance;
 import org.operaton.bpm.engine.runtime.TransitionInstance;
+
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Daniel Meyer
@@ -43,6 +43,13 @@ public final class ActivityInstanceAssert {
       this.actual = actual;
     }
 
+    public ActivityInstanceAssertThatClause isNotNull() {
+      if (actual == null) {
+        fail("Expected activity instance not to be null");
+      }
+      return this;
+    }
+
     public void hasStructure(ExpectedActivityInstance expected) {
       assertTreeMatch(expected, actual);
     }
@@ -50,7 +57,7 @@ public final class ActivityInstanceAssert {
     protected void assertTreeMatch(ExpectedActivityInstance expected, ActivityInstance actual) {
       boolean treesMatch = isTreeMatched(expected, actual);
       if (!treesMatch) {
-        Assert.fail("Could not match expected tree \n" + expected +" \n\n with actual tree \n\n "+actual);
+        fail("Could not match expected tree \n" + expected +" \n\n with actual tree \n\n "+actual);
       }
 
     }

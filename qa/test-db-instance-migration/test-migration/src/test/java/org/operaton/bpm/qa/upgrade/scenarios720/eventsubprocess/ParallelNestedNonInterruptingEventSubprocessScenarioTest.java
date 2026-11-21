@@ -16,26 +16,26 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.eventsubprocess;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate.ThrowBpmnErrorDelegateException;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ScenarioUnderTest("ParallelNestedNonInterruptingEventSubprocessScenario")
 @Origin("7.24.0")
 public class ParallelNestedNonInterruptingEventSubprocessScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -99,8 +99,8 @@ public class ParallelNestedNonInterruptingEventSubprocessScenarioTest {
 
     // then
     Task escalatedTask = rule.taskQuery().singleResult();
-    Assert.assertEquals("escalatedTask", escalatedTask.getTaskDefinitionKey());
-    Assert.assertNotNull(escalatedTask);
+    assertThat(escalatedTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
+    assertThat(escalatedTask).isNotNull();
 
     rule.getTaskService().complete(escalatedTask.getId());
     rule.assertScenarioEnded();
@@ -184,14 +184,14 @@ public class ParallelNestedNonInterruptingEventSubprocessScenarioTest {
 
     // then
     Task escalatedTask = rule.taskQuery().singleResult();
-    Assert.assertEquals("escalatedTask", escalatedTask.getTaskDefinitionKey());
-    Assert.assertNotNull(escalatedTask);
+    assertThat(escalatedTask.getTaskDefinitionKey()).isEqualTo("escalatedTask");
+    assertThat(escalatedTask).isNotNull();
 
     rule.getTaskService().complete(escalatedTask.getId());
 
     // the instance is deadlocked since no token has arrived on the sequence flow leaving the outer subprocess
-    Assert.assertEquals(1, rule.executionQuery().count());
-    Assert.assertEquals(1, rule.executionQuery().activityId("join").count());
+    assertThat(rule.executionQuery().count()).isEqualTo(1);
+    assertThat(rule.executionQuery().activityId("join").count()).isEqualTo(1);
   }
 
   @Test

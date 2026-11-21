@@ -22,12 +22,6 @@
         <groupId>org.operaton.bpm</groupId>
         <artifactId>operaton-engine</artifactId>
         <version>${project.version}</version>
-        <classifier>junit4</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.operaton.bpm</groupId>
-        <artifactId>operaton-engine</artifactId>
-        <version>${project.version}</version>
         <classifier>junit5</classifier>
       </dependency>
       <dependency>
@@ -161,11 +155,6 @@
       <dependency>
         <groupId>org.operaton.bpm.springboot</groupId>
         <artifactId>operaton-bpm-spring-boot-starter-security</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.operaton.bpm.springboot</groupId>
-        <artifactId>operaton-bpm-spring-boot-starter-test</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

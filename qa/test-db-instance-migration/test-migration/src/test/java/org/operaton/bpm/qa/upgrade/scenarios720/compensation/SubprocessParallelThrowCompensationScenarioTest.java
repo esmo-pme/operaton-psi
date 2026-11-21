@@ -16,17 +16,17 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.compensation;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ActivityInstance;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.assertThat;
 import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
@@ -38,8 +38,8 @@ import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeAc
 @Origin("7.24.0")
 public class SubprocessParallelThrowCompensationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -53,13 +53,13 @@ public class SubprocessParallelThrowCompensationScenarioTest {
 
     // then there is an active compensation handler task
     Task compensationHandlerTask = rule.taskQuery().taskDefinitionKey("undoTask").singleResult();
-    Assert.assertNotNull(compensationHandlerTask);
+    assertThat(compensationHandlerTask).isNotNull();
 
     // and it can be completed such that the process instance ends successfully
     rule.getTaskService().complete(compensationHandlerTask.getId());
 
     Task afterCompensateTask = rule.taskQuery().taskDefinitionKey("afterCompensate").singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
 
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.getTaskService().complete(concurrentTask.getId());
@@ -95,7 +95,7 @@ public class SubprocessParallelThrowCompensationScenarioTest {
 
     // then the activity instance tree is meaningful
     ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
-    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).isNotNull();
     assertThat(activityInstance).hasStructure(
       describeActivityInstanceTree(instance.getProcessDefinitionId())
         .activity("concurrentTask")
@@ -116,7 +116,7 @@ public class SubprocessParallelThrowCompensationScenarioTest {
     rule.getTaskService().complete(compensationHandlerTask.getId());
 
     Task afterCompensateTask = rule.taskQuery().taskDefinitionKey("afterCompensate").singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
 
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.getTaskService().complete(concurrentTask.getId());

@@ -18,19 +18,18 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson;
 
 import java.util.Date;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.impl.util.ClockUtil;
 import org.operaton.bpm.engine.management.JobDefinition;
 import org.operaton.bpm.engine.runtime.Job;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -44,15 +43,15 @@ public class TimerChangeJobDefinitionTest {
   protected static final Date FIXED_DATE_THREE = new Date(1363607600000L);
   protected static final Date FIXED_DATE_FOUR = new Date(1363607700000L);
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
-  @After
+  @AfterEach
   public void activateDefinitions() {
     engineRule.getManagementService().activateJobDefinitionByProcessDefinitionKey("oneTaskProcessTimerJob_710", true);
   }
 
-  @After
+  @AfterEach
   public void resetClock() {
     ClockUtil.reset();
   }
@@ -71,8 +70,8 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // assume
-    assertThat(job.isSuspended(), is(false));
-    assertThat(jobDefinition.isSuspended(), is(false));
+    assertThat(job.isSuspended()).isEqualTo(false);
+    assertThat(jobDefinition.isSuspended()).isEqualTo(false);
 
     Job timerJob = engineRule.getManagementService().createJobQuery()
       .timers()
@@ -96,8 +95,8 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // then
-    assertThat(job.isSuspended(), is(true));
-    assertThat(jobDefinition.isSuspended(), is(true));
+    assertThat(job.isSuspended()).isEqualTo(true);
+    assertThat(jobDefinition.isSuspended()).isEqualTo(true);
   }
 
   @ScenarioUnderTest("initTimerChangeJobDefinition.2")
@@ -109,7 +108,7 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // assume
-    assertThat(jobDefinition.isSuspended(), is(false));
+    assertThat(jobDefinition.isSuspended()).isEqualTo(false);
 
     Job timerJob = engineRule.getManagementService().createJobQuery()
       .timers()
@@ -128,7 +127,7 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // then
-    assertThat(jobDefinition.isSuspended(), is(true));
+    assertThat(jobDefinition.isSuspended()).isEqualTo(true);
   }
 
   @ScenarioUnderTest("initTimerChangeJobDefinition.3")
@@ -140,7 +139,7 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // assume
-    assertThat(jobDefinition.isSuspended(), is(false));
+    assertThat(jobDefinition.isSuspended()).isEqualTo(false);
 
     Job timerJob = engineRule.getManagementService().createJobQuery()
       .timers()
@@ -159,7 +158,7 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // then
-    assertThat(jobDefinition.isSuspended(), is(true));
+    assertThat(jobDefinition.isSuspended()).isEqualTo(true);
   }
 
   @ScenarioUnderTest("initTimerChangeJobDefinition.4")
@@ -171,7 +170,7 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // assume
-    assertThat(jobDefinition.isSuspended(), is(false));
+    assertThat(jobDefinition.isSuspended()).isEqualTo(false);
 
     Job timerJob = engineRule.getManagementService().createJobQuery()
       .timers()
@@ -190,7 +189,7 @@ public class TimerChangeJobDefinitionTest {
       .singleResult();
 
     // then
-    assertThat(jobDefinition.isSuspended(), is(true));
+    assertThat(jobDefinition.isSuspended()).isEqualTo(true);
   }
 
 }

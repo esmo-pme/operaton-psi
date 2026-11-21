@@ -18,14 +18,15 @@ package org.operaton.bpm.qa.upgrade.scenarios730.compensation;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thorben Lindhauer
@@ -35,8 +36,8 @@ import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
 @Origin("7.24.0")
 public class ParallelMultiInstanceCompensationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("singleActivityHandler.multiInstancePartial.1")
@@ -50,23 +51,23 @@ public class ParallelMultiInstanceCompensationScenarioTest {
     // then it is possible to throw compensation, compensate the three instances,
     // and finish the process successfully
     Task beforeCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(beforeCompensateTask);
+    assertThat(beforeCompensateTask).isNotNull();
     rule.getTaskService().complete(beforeCompensateTask.getId());
 
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
   }
@@ -100,19 +101,19 @@ public class ParallelMultiInstanceCompensationScenarioTest {
     // then it is possible to compensate the three instances,
     // and finish the process successfully
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
   }
@@ -136,21 +137,21 @@ public class ParallelMultiInstanceCompensationScenarioTest {
   public void testSingleActivityHandlerThrowCompensateCompletion() {
     // given active compensation
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     // when completing the compensation handlers
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     // then it is possible to complete the process successfully
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
 
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
@@ -178,23 +179,23 @@ public class ParallelMultiInstanceCompensationScenarioTest {
     // then it is possible to throw compensation, compensate the three instances,
     // and finish the process successfully
     Task beforeCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(beforeCompensateTask);
+    assertThat(beforeCompensateTask).isNotNull();
     rule.getTaskService().complete(beforeCompensateTask.getId());
 
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
   }
@@ -228,19 +229,19 @@ public class ParallelMultiInstanceCompensationScenarioTest {
     // then it is possible to compensate the three instances,
     // and finish the process successfully
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
   }
@@ -264,21 +265,21 @@ public class ParallelMultiInstanceCompensationScenarioTest {
   public void testDefaultHandlerThrowCompensateCompletion() {
     // given active compensation
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     // when completing the compensation handlers
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     // then it is possible to complete the process successfully
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
 
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
@@ -306,23 +307,23 @@ public class ParallelMultiInstanceCompensationScenarioTest {
     // then it is possible to throw compensation, compensate the three instances,
     // and finish the process successfully
     Task beforeCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(beforeCompensateTask);
+    assertThat(beforeCompensateTask).isNotNull();
     rule.getTaskService().complete(beforeCompensateTask.getId());
 
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
   }
@@ -356,19 +357,19 @@ public class ParallelMultiInstanceCompensationScenarioTest {
     // then it is possible to compensate the three instances,
     // and finish the process successfully
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();
   }
@@ -392,21 +393,21 @@ public class ParallelMultiInstanceCompensationScenarioTest {
   public void testSubProcessHandlerThrowCompensateCompletion() {
     // given active compensation
     List<Task> miCompensationTasks = rule.taskQuery().list();
-    Assert.assertEquals(3, miCompensationTasks.size());
+    assertThat(miCompensationTasks.size()).isEqualTo(3);
 
     // when completing the compensation handlers
     for (int i = 0; i < miCompensationTasks.size(); i++) {
-      Assert.assertEquals(3 - i, rule.taskQuery().count());
+      assertThat(rule.taskQuery().count()).isEqualTo(3 - i);
 
       Task compensationTask = miCompensationTasks.get(i);
-      Assert.assertEquals("undoTask", compensationTask.getTaskDefinitionKey());
+      assertThat(compensationTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
       rule.getTaskService().complete(compensationTask.getId());
     }
 
     // then it is possible to complete the process successfully
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
+    assertThat(afterCompensateTask).isNotNull();
 
     rule.getTaskService().complete(afterCompensateTask.getId());
     rule.assertScenarioEnded();

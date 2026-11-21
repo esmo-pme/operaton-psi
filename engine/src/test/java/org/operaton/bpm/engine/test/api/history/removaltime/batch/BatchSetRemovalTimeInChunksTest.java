@@ -80,7 +80,7 @@ import org.operaton.bpm.engine.variable.Variables;
 
 import static org.operaton.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.operaton.bpm.engine.impl.test.TestHelper.executeJobIgnoringException;
-import static org.operaton.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule.addDays;
+import static org.operaton.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeExtension.addDays;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;

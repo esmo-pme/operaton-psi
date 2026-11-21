@@ -16,16 +16,17 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.eventsubprocess;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.CompleteTaskThread;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thorben Lindhauer
@@ -35,8 +36,8 @@ import org.operaton.bpm.qa.upgrade.util.CompleteTaskThread;
 @Origin("7.24.0")
 public class NestedInterruptingEventSubprocessParallelScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -59,7 +60,7 @@ public class NestedInterruptingEventSubprocessParallelScenarioTest {
     completeTaskThread2.proceedAndWaitTillDone();
 
     // then
-    Assert.assertNull(completeTaskThread1.getException());
-    Assert.assertNotNull(completeTaskThread2.getException());
+    assertThat(completeTaskThread1.getException()).isNull();
+    assertThat(completeTaskThread2.getException()).isNotNull();
   }
 }

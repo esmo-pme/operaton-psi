@@ -19,9 +19,8 @@ package org.operaton.bpm.container.impl.jboss.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import org.operaton.bpm.container.impl.jboss.extension.BpmPlatformExtension;
 import org.operaton.bpm.container.impl.jboss.extension.ModelConstants;
@@ -30,7 +29,7 @@ import org.operaton.bpm.container.impl.jboss.extension.ModelConstants;
  *
  * @author Tobias Metzke
  */
-public class BpmPlatformSubsystemWithExpressionsTest extends AbstractSubsystemBaseTest {
+public class BpmPlatformSubsystemWithExpressionsTest extends AbstractJupiterSubsystemBaseTest {
 
   private static final Map<String, String> PROPERTIES = new HashMap<>();
 
@@ -47,12 +46,12 @@ public class BpmPlatformSubsystemWithExpressionsTest extends AbstractSubsystemBa
     super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension());
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void setUp() {
     System.getProperties().putAll(PROPERTIES);
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDown() {
     for (String key : PROPERTIES.keySet()) {
       System.clearProperty(key);

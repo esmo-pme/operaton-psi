@@ -18,15 +18,16 @@ package org.operaton.bpm.qa.upgrade.scenarios730.boundary;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.management.ActivityStatistics;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thorben Lindhauer
@@ -36,8 +37,8 @@ import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
 @Origin("7.24.0")
 public class NonInterruptingBoundaryEventScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -51,17 +52,17 @@ public class NonInterruptingBoundaryEventScenarioTest {
       .list();
 
     // then
-    Assert.assertEquals(2, activityStatistics.size());
+    assertThat(activityStatistics.size()).isEqualTo(2);
 
     ActivityStatistics outerTaskStatistics = getStatistics(activityStatistics, "outerTask");
-    Assert.assertNotNull(outerTaskStatistics);
-    Assert.assertEquals("outerTask", outerTaskStatistics.getId());
-    Assert.assertEquals(1, outerTaskStatistics.getInstances());
+    assertThat(outerTaskStatistics).isNotNull();
+    assertThat(outerTaskStatistics.getId()).isEqualTo("outerTask");
+    assertThat(outerTaskStatistics.getInstances()).isEqualTo(1);
 
     ActivityStatistics afterBoundaryStatistics = getStatistics(activityStatistics, "afterBoundaryTask");
-    Assert.assertNotNull(afterBoundaryStatistics);
-    Assert.assertEquals("afterBoundaryTask", afterBoundaryStatistics.getId());
-    Assert.assertEquals(1, afterBoundaryStatistics.getInstances());
+    assertThat(afterBoundaryStatistics).isNotNull();
+    assertThat(afterBoundaryStatistics.getId()).isEqualTo("afterBoundaryTask");
+    assertThat(afterBoundaryStatistics.getInstances()).isEqualTo(1);
   }
 
   protected ActivityStatistics getStatistics(List<ActivityStatistics> activityStatistics, String activityId) {

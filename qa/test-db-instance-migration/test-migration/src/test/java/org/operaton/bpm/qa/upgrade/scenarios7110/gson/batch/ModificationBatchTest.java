@@ -18,20 +18,19 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson.batch;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.batch.Batch;
 import org.operaton.bpm.engine.history.HistoricActivityInstance;
 import org.operaton.bpm.engine.runtime.Execution;
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -40,8 +39,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Origin("7.24.0")
 public class ModificationBatchTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initModificationBatch.1")
   @Test
@@ -53,7 +52,7 @@ public class ModificationBatchTest {
       .list();
 
     // assume
-    assertThat(executions.size(), is(10));
+    assertThat(executions.size()).isEqualTo(10);
 
     List<Batch> batches = engineRule.getManagementService().createBatchQuery()
       .type(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION)
@@ -97,12 +96,12 @@ public class ModificationBatchTest {
       .list();
 
     // then
-    assertThat(executionsInUserTaskOne.size(), is(20));
-    assertThat(executionsInUserTaskTwo.size(), is(10));
-    assertThat(executionsInUserTaskThree.size(), is(10));
+    assertThat(executionsInUserTaskOne.size()).isEqualTo(20);
+    assertThat(executionsInUserTaskTwo.size()).isEqualTo(10);
+    assertThat(executionsInUserTaskThree.size()).isEqualTo(10);
 
-    assertThat(executionsInUserTaskFour.size(), is(0));
-    assertThat(canceledActivityInstances.size(), is(1));
+    assertThat(executionsInUserTaskFour.size()).isEqualTo(0);
+    assertThat(canceledActivityInstances.size()).isEqualTo(1);
   }
 
   protected Batch findBatchByTotalJobs(int totalJobsCount, List<Batch> batches) {

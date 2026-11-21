@@ -16,14 +16,15 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.compensation;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thorben Lindhauer
@@ -33,8 +34,8 @@ import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
 @Origin("7.24.0")
 public class InterruptingEventSubprocessCompensationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.1")
@@ -45,15 +46,15 @@ public class InterruptingEventSubprocessCompensationScenarioTest {
 
     // then there is an active compensation handler task
     Task compensationHandlerTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(compensationHandlerTask);
-    Assert.assertEquals("undoTask", compensationHandlerTask.getTaskDefinitionKey());
+    assertThat(compensationHandlerTask).isNotNull();
+    assertThat(compensationHandlerTask.getTaskDefinitionKey()).isEqualTo("undoTask");
 
     // and it can be completed such that the process instance ends successfully
     rule.getTaskService().complete(compensationHandlerTask.getId());
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
-    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+    assertThat(afterCompensateTask).isNotNull();
+    assertThat(afterCompensateTask.getTaskDefinitionKey()).isEqualTo("afterCompensate");
 
     rule.getTaskService().complete(afterCompensateTask.getId());
 
@@ -84,8 +85,8 @@ public class InterruptingEventSubprocessCompensationScenarioTest {
     rule.getTaskService().complete(compensationHandlerTask.getId());
 
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
-    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+    assertThat(afterCompensateTask).isNotNull();
+    assertThat(afterCompensateTask.getTaskDefinitionKey()).isEqualTo("afterCompensate");
 
     rule.getTaskService().complete(afterCompensateTask.getId());
 

@@ -41,7 +41,7 @@ import org.operaton.bpm.engine.rest.util.container.TestContainerExtension;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
-import static junit.framework.TestCase.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -404,7 +404,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     String content = response.asString();
     List<Map<String, Object>> logs = from(content).getList("");
     assertThat(logs).as("There should be one historic externalTask log returned.").hasSize(1);
-    assertNotNull("The returned historic externalTask log should not be null.", logs.get(0));
+    assertNotNull(logs.get(0), "The returned historic externalTask log should not be null.");
 
     String returnedId = from(content).getString("[0].id");
     String returnedTimestamp = from(content).getString("[0].timestamp");
@@ -469,7 +469,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     String content = response.asString();
     List<Map<String, Object>> logs = from(content).getList("");
     assertThat(logs).as("There should be one historic externalTask log returned.").hasSize(1);
-    assertNotNull("The returned historic externalTask log should not be null.", logs.get(0));
+    assertNotNull(logs.get(0), "The returned historic externalTask log should not be null.");
 
     String returnedId = from(content).getString("[0].id");
     String returnedTimestamp = from(content).getString("[0].timestamp");

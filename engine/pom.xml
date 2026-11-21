@@ -134,11 +134,6 @@
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <!-- provided dependencies -->
 
@@ -220,12 +215,6 @@
 
 
     <!-- test dependencies  -->
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
@@ -419,7 +408,6 @@
             <configuration>
               <sources>
                 <source>src/main/junit-shared</source>
-                <source>src/main/junit4</source>
                 <source>src/main/junit5</source>
               </sources>
             </configuration>
@@ -481,16 +469,6 @@
             </configuration>
           </execution>
           <execution>
-            <id>junit4-jar</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <classifier>junit4</classifier>
-              <classesDirectory>${project.build.directory}/classes-junit4</classesDirectory>
-            </configuration>
-          </execution>
-          <execution>
             <id>junit5-jar</id>
             <goals>
               <goal>jar</goal>
@@ -536,7 +514,6 @@
               <compileSourceRoots>
                 <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
                 <compileSourceRoot>${project.basedir}/src/main/junit-shared</compileSourceRoot>
-                <compileSourceRoot>${project.basedir}/src/main/junit4</compileSourceRoot>
                 <compileSourceRoot>${project.basedir}/src/main/junit5</compileSourceRoot>
               </compileSourceRoots>
               </configuration>
@@ -551,25 +528,10 @@
               <compileSourceRoots>
                 <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
                 <compileSourceRoot>${project.basedir}/src/main/junit-shared</compileSourceRoot>
-                <compileSourceRoot>${project.basedir}/src/main/junit4</compileSourceRoot>
                 <compileSourceRoot>${project.basedir}/src/main/junit5</compileSourceRoot>
                 <compileSourceRoot>${project.basedir}/src/test/java</compileSourceRoot>
                 <compileSourceRoot>${project.basedir}/src/test/junit5</compileSourceRoot>
               </compileSourceRoots>
-            </configuration>
-          </execution>
-          <execution>
-            <id>junit4-Compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <compileSourceRoots>
-                <compileSourceRoot>${project.basedir}/src/main/junit-shared</compileSourceRoot>
-                <compileSourceRoot>${project.basedir}/src/main/junit4</compileSourceRoot>
-              </compileSourceRoots>
-              <outputDirectory>${project.build.directory}/classes-junit4</outputDirectory>
             </configuration>
           </execution>
           <execution>

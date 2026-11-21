@@ -33,20 +33,19 @@ import org.operaton.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.runtime.ProcessInstanceQuery;
 import org.operaton.bpm.engine.task.TaskQuery;
-import org.operaton.bpm.engine.test.junit5.ProcessEngineExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * JUnit 5 extension counterpart for {@link UpgradeTestRule}.
+ * JUnit 5 extension for upgrade tests.
  *
  * <p>
  * It determines the scenario and origin based on the {@link ScenarioUnderTest}
- * and {@link Origin} annotations and exposes convenience accessors that were
- * previously available on the JUnit 4 rule.
+ * and {@link Origin} annotations and exposes convenience accessors for the
+ * process instance of the scenario.
  * </p>
  */
-public class UpgradeTestExtension extends ProcessEngineExtension {
+public class UpgradeTestExtension extends UpgradeProcessEngineExtension {
 
   protected String scenarioTestedByClass;
   protected String scenarioName;

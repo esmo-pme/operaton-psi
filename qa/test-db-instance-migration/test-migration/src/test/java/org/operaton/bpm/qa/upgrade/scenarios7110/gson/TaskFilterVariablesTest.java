@@ -16,16 +16,15 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios7110.gson;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.filter.Filter;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -34,8 +33,8 @@ import static org.hamcrest.core.Is.is;
 @Origin("7.24.0")
 public class TaskFilterVariablesTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initTaskFilterVariables.1")
   @Test
@@ -45,42 +44,42 @@ public class TaskFilterVariablesTest {
       .filterName("filterBooleanVariable")
       .singleResult();
 
-    assertThat(engineRule.getFilterService().count(filter.getId()), is(1L));
+    assertThat(engineRule.getFilterService().count(filter.getId())).isEqualTo(1L);
 
     // int filter
     filter = engineRule.getFilterService().createFilterQuery()
       .filterName("filterIntVariable")
       .singleResult();
 
-    assertThat(engineRule.getFilterService().count(filter.getId()), is(1L));
+    assertThat(engineRule.getFilterService().count(filter.getId())).isEqualTo(1L);
 
     // int out of range filter
     filter = engineRule.getFilterService().createFilterQuery()
       .filterName("filterIntOutOfRangeVariable")
       .singleResult();
 
-    assertThat(engineRule.getFilterService().count(filter.getId()), is(1L));
+    assertThat(engineRule.getFilterService().count(filter.getId())).isEqualTo(1L);
 
     // double filter
     filter = engineRule.getFilterService().createFilterQuery()
       .filterName("filterDoubleVariable")
       .singleResult();
 
-    assertThat(engineRule.getFilterService().count(filter.getId()), is(1L));
+    assertThat(engineRule.getFilterService().count(filter.getId())).isEqualTo(1L);
 
     // string filter
     filter = engineRule.getFilterService().createFilterQuery()
       .filterName("filterStringVariable")
       .singleResult();
 
-    assertThat(engineRule.getFilterService().count(filter.getId()), is(1L));
+    assertThat(engineRule.getFilterService().count(filter.getId())).isEqualTo(1L);
 
     // null filter
     filter = engineRule.getFilterService().createFilterQuery()
       .filterName("filterNullVariable")
       .singleResult();
 
-    assertThat(engineRule.getFilterService().count(filter.getId()), is(1L));
+    assertThat(engineRule.getFilterService().count(filter.getId())).isEqualTo(1L);
   }
 
 }

@@ -16,14 +16,15 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios730.job;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * This actually tests migration from 7.0 jobs (where there was no suspension state)
@@ -35,8 +36,8 @@ import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
 @Origin("7.24.0")
 public class JobMigrationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("createJob.1")
@@ -45,7 +46,7 @@ public class JobMigrationScenarioTest {
     Job job = rule.getManagementService().createJobQuery().jobId(rule.getBusinessKey()).singleResult();
 
     // then
-    Assert.assertNotNull(job);
-    Assert.assertFalse(job.isSuspended());
+    assertThat(job).isNotNull();
+    assertThat(job.isSuspended()).isFalse();
   }
 }

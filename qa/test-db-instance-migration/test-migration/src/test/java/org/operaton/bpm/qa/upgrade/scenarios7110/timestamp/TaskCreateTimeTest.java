@@ -16,14 +16,13 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios7110.timestamp;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.operaton.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -46,6 +45,6 @@ public class TaskCreateTimeTest extends AbstractTimestampMigrationTest {
     assertNotNull(task);
 
     // then
-    assertThat(task.getCreateTime(), is(TIMESTAMP));
+    assertThat(task.getCreateTime()).isEqualTo(TIMESTAMP);
   }
 }

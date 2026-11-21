@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.filter.Filter;
 import org.operaton.bpm.engine.impl.QueryEntityRelationCondition;
@@ -31,14 +31,13 @@ import org.operaton.bpm.engine.impl.TaskQueryImpl;
 import org.operaton.bpm.engine.impl.TaskQueryVariableValue;
 import org.operaton.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.operaton.bpm.engine.task.DelegationState;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.engine.variable.type.ValueType;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Tassilo Weidner
@@ -47,8 +46,8 @@ import static org.junit.Assert.assertTrue;
 @Origin("7.24.0")
 public class TaskFilterTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initTaskFilter.1")
   @Test
@@ -80,127 +79,127 @@ public class TaskFilterTest {
     Filter filter = engineRule.getFilterService().createTaskFilterQuery().filterName("filter").singleResult();
 
     TaskQueryImpl query = filter.getQuery();
-    assertEquals(testString, query.getTaskId());
-    assertEquals(testString, query.getName());
-    assertEquals(testString, query.getNameNotEqual());
-    assertEquals(testString, query.getNameNotLike());
-    assertEquals(testString, query.getNameLike());
-    assertEquals(testString, query.getDescription());
-    assertEquals(testString, query.getDescriptionLike());
-    assertEquals(testInteger, query.getPriority());
-    assertEquals(testInteger, query.getMinPriority());
-    assertEquals(testInteger, query.getMaxPriority());
-    assertEquals(testString, query.getAssignee());
-    assertEquals(testString, query.getExpressions().get("taskAssignee"));
-    assertEquals(testString, query.getAssigneeLike());
-    assertEquals(testString, query.getExpressions().get("taskAssigneeLike"));
-    assertEquals(testString, query.getInvolvedUser());
-    assertEquals(testString, query.getExpressions().get("taskInvolvedUser"));
-    assertEquals(testString, query.getOwner());
-    assertEquals(testString, query.getExpressions().get("taskOwner"));
-    assertTrue(query.isUnassigned());
-    assertTrue(query.isAssigned());
-    assertEquals(testDelegationState, query.getDelegationState());
-    assertEquals(testCandidateGroups, query.getCandidateGroups());
-    assertTrue(query.isWithCandidateGroups());
-    assertTrue(query.isWithoutCandidateGroups());
-    assertTrue(query.isWithCandidateUsers());
-    assertTrue(query.isWithoutCandidateUsers());
-    assertEquals(testString, query.getExpressions().get("taskCandidateGroupIn"));
-    assertEquals(testString, query.getProcessInstanceId());
-    assertEquals(testString, query.getExecutionId());
-    assertEquals(testActivityInstances.length, query.getActivityInstanceIdIn().length);
+    assertThat(query.getTaskId()).isEqualTo(testString);
+    assertThat(query.getName()).isEqualTo(testString);
+    assertThat(query.getNameNotEqual()).isEqualTo(testString);
+    assertThat(query.getNameNotLike()).isEqualTo(testString);
+    assertThat(query.getNameLike()).isEqualTo(testString);
+    assertThat(query.getDescription()).isEqualTo(testString);
+    assertThat(query.getDescriptionLike()).isEqualTo(testString);
+    assertThat(query.getPriority()).isEqualTo(testInteger);
+    assertThat(query.getMinPriority()).isEqualTo(testInteger);
+    assertThat(query.getMaxPriority()).isEqualTo(testInteger);
+    assertThat(query.getAssignee()).isEqualTo(testString);
+    assertThat(query.getExpressions().get("taskAssignee")).isEqualTo(testString);
+    assertThat(query.getAssigneeLike()).isEqualTo(testString);
+    assertThat(query.getExpressions().get("taskAssigneeLike")).isEqualTo(testString);
+    assertThat(query.getInvolvedUser()).isEqualTo(testString);
+    assertThat(query.getExpressions().get("taskInvolvedUser")).isEqualTo(testString);
+    assertThat(query.getOwner()).isEqualTo(testString);
+    assertThat(query.getExpressions().get("taskOwner")).isEqualTo(testString);
+    assertThat(query.isUnassigned()).isTrue();
+    assertThat(query.isAssigned()).isTrue();
+    assertThat(query.getDelegationState()).isEqualTo(testDelegationState);
+    assertThat(query.getCandidateGroups()).isEqualTo(testCandidateGroups);
+    assertThat(query.isWithCandidateGroups()).isTrue();
+    assertThat(query.isWithoutCandidateGroups()).isTrue();
+    assertThat(query.isWithCandidateUsers()).isTrue();
+    assertThat(query.isWithoutCandidateUsers()).isTrue();
+    assertThat(query.getExpressions().get("taskCandidateGroupIn")).isEqualTo(testString);
+    assertThat(query.getProcessInstanceId()).isEqualTo(testString);
+    assertThat(query.getExecutionId()).isEqualTo(testString);
+    assertThat(query.getActivityInstanceIdIn().length).isEqualTo(testActivityInstances.length);
     for (int i = 0; i < query.getActivityInstanceIdIn().length; i++) {
-      assertEquals(testActivityInstances[i], query.getActivityInstanceIdIn()[i]);
+      assertThat(query.getActivityInstanceIdIn()[i]).isEqualTo(testActivityInstances[i]);
     }
-    assertEquals(testDate, query.getCreateTime());
-    assertEquals(testString, query.getExpressions().get("taskCreatedOn"));
-    assertEquals(testDate, query.getCreateTimeBefore());
-    assertEquals(testString, query.getExpressions().get("taskCreatedBefore"));
-    assertEquals(testDate, query.getCreateTimeAfter());
-    assertEquals(testString, query.getExpressions().get("taskCreatedAfter"));
-    assertEquals(testString, query.getKey());
-    assertEquals(testKeys.length, query.getKeys().length);
+    assertThat(query.getCreateTime()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("taskCreatedOn")).isEqualTo(testString);
+    assertThat(query.getCreateTimeBefore()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("taskCreatedBefore")).isEqualTo(testString);
+    assertThat(query.getCreateTimeAfter()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("taskCreatedAfter")).isEqualTo(testString);
+    assertThat(query.getKey()).isEqualTo(testString);
+    assertThat(query.getKeys().length).isEqualTo(testKeys.length);
     for (int i = 0; i < query.getKeys().length; i++) {
-      assertEquals(testKeys[i], query.getKeys()[i]);
+      assertThat(query.getKeys()[i]).isEqualTo(testKeys[i]);
     }
-    assertEquals(testString, query.getKeyLike());
-    assertEquals(testString, query.getProcessDefinitionKey());
+    assertThat(query.getKeyLike()).isEqualTo(testString);
+    assertThat(query.getProcessDefinitionKey()).isEqualTo(testString);
     for (int i = 0; i < query.getProcessDefinitionKeys().length; i++) {
-      assertEquals(testKeys[i], query.getProcessDefinitionKeys()[i]);
+      assertThat(query.getProcessDefinitionKeys()[i]).isEqualTo(testKeys[i]);
     }
-    assertEquals(testString, query.getProcessDefinitionId());
-    assertEquals(testString, query.getProcessDefinitionName());
-    assertEquals(testString, query.getProcessDefinitionNameLike());
-    assertEquals(testString, query.getProcessInstanceBusinessKey());
-    assertEquals(testString, query.getExpressions().get("processInstanceBusinessKey"));
+    assertThat(query.getProcessDefinitionId()).isEqualTo(testString);
+    assertThat(query.getProcessDefinitionName()).isEqualTo(testString);
+    assertThat(query.getProcessDefinitionNameLike()).isEqualTo(testString);
+    assertThat(query.getProcessInstanceBusinessKey()).isEqualTo(testString);
+    assertThat(query.getExpressions().get("processInstanceBusinessKey")).isEqualTo(testString);
     for (int i = 0; i < query.getProcessInstanceBusinessKeys().length; i++) {
-      assertEquals(testKeys[i], query.getProcessInstanceBusinessKeys()[i]);
+      assertThat(query.getProcessInstanceBusinessKeys()[i]).isEqualTo(testKeys[i]);
     }
-    assertEquals(testString, query.getProcessInstanceBusinessKeyLike());
-    assertEquals(testString, query.getExpressions().get("processInstanceBusinessKeyLike"));
+    assertThat(query.getProcessInstanceBusinessKeyLike()).isEqualTo(testString);
+    assertThat(query.getExpressions().get("processInstanceBusinessKeyLike")).isEqualTo(testString);
 
     // variables
     List<TaskQueryVariableValue> variables = query.getVariables();
     for (int i = 0; i < variables.size(); i++) {
       TaskQueryVariableValue variable = variables.get(i);
-      assertEquals(variableNames[i], variable.getName());
-      assertEquals(variableValues[i], variable.getValue());
-      assertEquals(variableOperators[i], variable.getOperator());
-      assertEquals(isTaskVariable[i], variable.isLocal());
-      assertEquals(isProcessVariable[i], variable.isProcessInstanceVariable());
+      assertThat(variable.getName()).isEqualTo(variableNames[i]);
+      assertThat(variable.getValue()).isEqualTo(variableValues[i]);
+      assertThat(variable.getOperator()).isEqualTo(variableOperators[i]);
+      assertThat(variable.isLocal()).isEqualTo(isTaskVariable[i]);
+      assertThat(variable.isProcessInstanceVariable()).isEqualTo(isProcessVariable[i]);
     }
 
-    assertEquals(testDate, query.getDueDate());
-    assertEquals(testString, query.getExpressions().get("dueDate"));
-    assertEquals(testDate, query.getDueBefore());
-    assertEquals(testString, query.getExpressions().get("dueBefore"));
-    assertEquals(testDate, query.getDueAfter());
-    assertEquals(testString, query.getExpressions().get("dueAfter"));
-    assertEquals(testDate, query.getFollowUpDate());
-    assertEquals(testString, query.getExpressions().get("followUpDate"));
-    assertEquals(testDate, query.getFollowUpBefore());
-    assertEquals(testString, query.getExpressions().get("followUpBefore"));
-    assertEquals(testDate, query.getFollowUpAfter());
-    assertEquals(testString, query.getExpressions().get("followUpAfter"));
-    assertTrue(query.isExcludeSubtasks());
-    assertEquals(SuspensionState.SUSPENDED, query.getSuspensionState());
-    assertEquals(testString, query.getCaseDefinitionKey());
-    assertEquals(testString, query.getCaseDefinitionId());
-    assertEquals(testString, query.getCaseDefinitionName());
-    assertEquals(testString, query.getCaseDefinitionNameLike());
-    assertEquals(testString, query.getCaseInstanceId());
-    assertEquals(testString, query.getCaseInstanceBusinessKey());
-    assertEquals(testString, query.getCaseInstanceBusinessKeyLike());
-    assertEquals(testString, query.getCaseExecutionId());
+    assertThat(query.getDueDate()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("dueDate")).isEqualTo(testString);
+    assertThat(query.getDueBefore()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("dueBefore")).isEqualTo(testString);
+    assertThat(query.getDueAfter()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("dueAfter")).isEqualTo(testString);
+    assertThat(query.getFollowUpDate()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("followUpDate")).isEqualTo(testString);
+    assertThat(query.getFollowUpBefore()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("followUpBefore")).isEqualTo(testString);
+    assertThat(query.getFollowUpAfter()).isEqualTo(testDate);
+    assertThat(query.getExpressions().get("followUpAfter")).isEqualTo(testString);
+    assertThat(query.isExcludeSubtasks()).isTrue();
+    assertThat(query.getSuspensionState()).isEqualTo(SuspensionState.SUSPENDED);
+    assertThat(query.getCaseDefinitionKey()).isEqualTo(testString);
+    assertThat(query.getCaseDefinitionId()).isEqualTo(testString);
+    assertThat(query.getCaseDefinitionName()).isEqualTo(testString);
+    assertThat(query.getCaseDefinitionNameLike()).isEqualTo(testString);
+    assertThat(query.getCaseInstanceId()).isEqualTo(testString);
+    assertThat(query.getCaseInstanceBusinessKey()).isEqualTo(testString);
+    assertThat(query.getCaseInstanceBusinessKeyLike()).isEqualTo(testString);
+    assertThat(query.getCaseExecutionId()).isEqualTo(testString);
 
     // ordering
     verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
   }
 
   protected void verifyOrderingProperties(List<QueryOrderingProperty> expectedProperties, List<QueryOrderingProperty> actualProperties) {
-    assertEquals(expectedProperties.size(), actualProperties.size());
+    assertThat(actualProperties.size()).isEqualTo(expectedProperties.size());
 
     for (int i = 0; i < expectedProperties.size(); i++) {
       QueryOrderingProperty expectedProperty = expectedProperties.get(i);
       QueryOrderingProperty actualProperty = actualProperties.get(i);
 
-      assertEquals(expectedProperty.getRelation(), actualProperty.getRelation());
-      assertEquals(expectedProperty.getDirection(), actualProperty.getDirection());
-      assertEquals(expectedProperty.isContainedProperty(), actualProperty.isContainedProperty());
-      assertEquals(expectedProperty.getQueryProperty(), actualProperty.getQueryProperty());
+      assertThat(actualProperty.getRelation()).isEqualTo(expectedProperty.getRelation());
+      assertThat(actualProperty.getDirection()).isEqualTo(expectedProperty.getDirection());
+      assertThat(actualProperty.isContainedProperty()).isEqualTo(expectedProperty.isContainedProperty());
+      assertThat(actualProperty.getQueryProperty()).isEqualTo(expectedProperty.getQueryProperty());
 
       List<QueryEntityRelationCondition> expectedRelationConditions = expectedProperty.getRelationConditions();
       List<QueryEntityRelationCondition> actualRelationConditions = expectedProperty.getRelationConditions();
 
       if (expectedRelationConditions != null && actualRelationConditions != null) {
-        assertEquals(expectedRelationConditions.size(), actualRelationConditions.size());
+        assertThat(actualRelationConditions.size()).isEqualTo(expectedRelationConditions.size());
 
         for (QueryEntityRelationCondition expectedFilteringProperty : expectedRelationConditions) {
 
-          assertEquals(expectedFilteringProperty.getProperty(), expectedFilteringProperty.getProperty());
-          assertEquals(expectedFilteringProperty.getComparisonProperty(), expectedFilteringProperty.getComparisonProperty());
-          assertEquals(expectedFilteringProperty.getScalarValue(), expectedFilteringProperty.getScalarValue());
+          assertThat(expectedFilteringProperty.getProperty()).isEqualTo(expectedFilteringProperty.getProperty());
+          assertThat(expectedFilteringProperty.getComparisonProperty()).isEqualTo(expectedFilteringProperty.getComparisonProperty());
+          assertThat(expectedFilteringProperty.getScalarValue()).isEqualTo(expectedFilteringProperty.getScalarValue());
         }
       } else if (expectedRelationConditions != null || actualRelationConditions != null) {
         fail("Expected filtering properties: %s. Actual filtering properties: %s".formatted(expectedRelationConditions, actualRelationConditions));

@@ -59,16 +59,6 @@
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.operaton.bpm.juel</groupId>
@@ -142,7 +132,6 @@
             <configuration>
               <sources>
                 <source>src/main/junit-shared</source>
-                <source>src/main/junit4</source>
                 <source>src/main/junit5</source>
               </sources>
             </configuration>
@@ -155,7 +144,6 @@
             </goals>
             <configuration>
               <sources>
-                <source>src/test/junit4</source>
                 <source>src/test/junit5</source>
               </sources>
             </configuration>
@@ -171,16 +159,6 @@
             <goals>
               <goal>jar</goal>
             </goals>
-          </execution>
-          <execution>
-            <id>junit4-jar</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <classifier>junit4</classifier>
-              <classesDirectory>${project.build.directory}/classes-junit4</classesDirectory>
-            </configuration>
           </execution>
           <execution>
             <id>junit5-jar</id>
@@ -214,23 +192,6 @@
             <goals>
               <goal>testCompile</goal>
             </goals>
-          </execution>
-          <!-- Additional execution to compile code needed for JUnit4 test only -->
-          <execution>
-            <id>junit4-compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <!-- Specify the extra test source folder -->
-              <compileSourceRoots>
-                <compileSourceRoot>${project.basedir}/src/main/junit-shared</compileSourceRoot>
-                <compileSourceRoot>${project.basedir}/src/main/junit4</compileSourceRoot>
-              </compileSourceRoots>
-              <!-- Set its own output directory -->
-              <outputDirectory>${project.build.directory}/classes-junit4</outputDirectory>
-            </configuration>
           </execution>
           <!-- Additional execution to compile code needed for JUnit5 test only -->
           <execution>

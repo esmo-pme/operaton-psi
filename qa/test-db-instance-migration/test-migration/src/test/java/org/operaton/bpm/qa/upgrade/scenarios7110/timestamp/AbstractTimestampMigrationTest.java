@@ -18,8 +18,8 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.timestamp;
 
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.ExternalTaskService;
 import org.operaton.bpm.engine.HistoryService;
@@ -28,11 +28,9 @@ import org.operaton.bpm.engine.ManagementService;
 import org.operaton.bpm.engine.RepositoryService;
 import org.operaton.bpm.engine.RuntimeService;
 import org.operaton.bpm.engine.TaskService;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -42,8 +40,8 @@ public abstract class AbstractTimestampMigrationTest {
   protected static final long TIME = 1548082136000L;
   protected static final Date TIMESTAMP = new Date(TIME);
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   protected RuntimeService runtimeService;
   protected RepositoryService repositoryService;
@@ -53,7 +51,7 @@ public abstract class AbstractTimestampMigrationTest {
   protected ExternalTaskService externalTaskService;
   protected IdentityService identityService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     runtimeService = engineRule.getRuntimeService();
     repositoryService = engineRule.getRepositoryService();
@@ -65,6 +63,6 @@ public abstract class AbstractTimestampMigrationTest {
   }
 
   protected void assertNotNull(Object object) {
-    assertThat(object, is(notNullValue()));
+    assertThat(object).isNotNull();
   }
 }

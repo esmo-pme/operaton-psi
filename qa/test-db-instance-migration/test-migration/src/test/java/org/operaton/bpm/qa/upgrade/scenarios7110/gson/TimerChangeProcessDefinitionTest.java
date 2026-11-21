@@ -18,20 +18,19 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson;
 
 import java.util.Date;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.impl.util.ClockUtil;
 import org.operaton.bpm.engine.repository.ProcessDefinition;
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -44,15 +43,15 @@ public class TimerChangeProcessDefinitionTest {
   protected static final Date FIXED_DATE_TWO = new Date(1363608500000L);
   protected static final Date FIXED_DATE_THREE = new Date(1363608600000L);
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
-  @After
+  @AfterEach
   public void activateDefinitions() {
     engineRule.getRepositoryService().activateProcessDefinitionByKey("oneTaskProcessTimer_710");
   }
 
-  @After
+  @AfterEach
   public void resetClock() {
     ClockUtil.reset();
   }
@@ -65,7 +64,7 @@ public class TimerChangeProcessDefinitionTest {
       .processInstanceBusinessKey("TimerChangeProcessDefinitionScenarioV1")
       .singleResult();
 
-    assertThat(processInstance.isSuspended(), is(false));
+    assertThat(processInstance.isSuspended()).isEqualTo(false);
 
     Job job = engineRule.getManagementService().createJobQuery()
       .timers()
@@ -87,8 +86,8 @@ public class TimerChangeProcessDefinitionTest {
       .singleResult();
 
     // then
-    assertThat(processInstance.isSuspended(), is(true));
-    assertThat(processDefinition.isSuspended(), is(true));
+    assertThat(processInstance.isSuspended()).isEqualTo(true);
+    assertThat(processDefinition.isSuspended()).isEqualTo(true);
   }
 
   @ScenarioUnderTest("initTimerChangeProcessDefinition.2")
@@ -99,7 +98,7 @@ public class TimerChangeProcessDefinitionTest {
       .processInstanceBusinessKey("TimerChangeProcessDefinitionScenarioV2")
       .singleResult();
 
-    assertThat(processInstance.isSuspended(), is(false));
+    assertThat(processInstance.isSuspended()).isEqualTo(false);
 
     Job job = engineRule.getManagementService().createJobQuery()
       .timers()
@@ -121,8 +120,8 @@ public class TimerChangeProcessDefinitionTest {
       .singleResult();
 
     // then
-    assertThat(processInstance.isSuspended(), is(true));
-    assertThat(processDefinition.isSuspended(), is(true));
+    assertThat(processInstance.isSuspended()).isEqualTo(true);
+    assertThat(processDefinition.isSuspended()).isEqualTo(true);
   }
 
   @ScenarioUnderTest("initTimerChangeProcessDefinition.3")
@@ -139,8 +138,8 @@ public class TimerChangeProcessDefinitionTest {
       .singleResult();
 
     // assume
-    assertThat(processDefinitionWithoutTenantId.isSuspended(), is(false));
-    assertThat(processDefinitionWithTenantId.isSuspended(), is(false));
+    assertThat(processDefinitionWithoutTenantId.isSuspended()).isEqualTo(false);
+    assertThat(processDefinitionWithTenantId.isSuspended()).isEqualTo(false);
 
     // given
     Job job = engineRule.getManagementService().createJobQuery()
@@ -165,8 +164,8 @@ public class TimerChangeProcessDefinitionTest {
       .singleResult();
 
     // then
-    assertThat(processDefinitionWithTenantId.isSuspended(), is(false));
-    assertThat(processDefinitionWithoutTenantId.isSuspended(), is(true));
+    assertThat(processDefinitionWithTenantId.isSuspended()).isEqualTo(false);
+    assertThat(processDefinitionWithoutTenantId.isSuspended()).isEqualTo(true);
   }
 
 }

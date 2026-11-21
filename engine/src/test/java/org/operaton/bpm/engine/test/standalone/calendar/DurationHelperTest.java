@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.operaton.bpm.engine.impl.calendar.DurationHelper;
 import org.operaton.bpm.engine.impl.util.ClockUtil;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DurationHelperTest {

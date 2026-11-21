@@ -16,16 +16,17 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios730.compensation;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests that the 7.2-to-current migration logic (where an event subprocess was no scope)
@@ -37,8 +38,8 @@ import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
 @Origin("7.24.0")
 public class InterruptingEventSubProcessNestedCompensationSenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.throwCompensate.1")
@@ -52,8 +53,8 @@ public class InterruptingEventSubProcessNestedCompensationSenarioTest {
     // then it is possible to complete the process successfully
     // by completing the sub process regularly
     Task afterCompensateTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterCompensateTask);
-    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+    assertThat(afterCompensateTask).isNotNull();
+    assertThat(afterCompensateTask.getTaskDefinitionKey()).isEqualTo("afterCompensate");
 
     rule.getTaskService().complete(afterCompensateTask.getId());
 
@@ -64,7 +65,7 @@ public class InterruptingEventSubProcessNestedCompensationSenarioTest {
    * Fails because wrongly destroy the sub process scope execution when completing the
    * compensation throw event. See CAM-4914
    */
-  @Ignore
+  @Disabled
   @Test
   @ScenarioUnderTest("init.throwCompensate.2")
   public void testInitThrowCompensateCompletionCase2() {
@@ -78,8 +79,8 @@ public class InterruptingEventSubProcessNestedCompensationSenarioTest {
     // by triggering the message boundary event
     rule.messageCorrelation("BoundaryEventMessage").correlate();
     Task afterBoundaryTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(afterBoundaryTask);
-    Assert.assertEquals("afterBoundaryTask", afterBoundaryTask.getTaskDefinitionKey());
+    assertThat(afterBoundaryTask).isNotNull();
+    assertThat(afterBoundaryTask.getTaskDefinitionKey()).isEqualTo("afterBoundaryTask");
 
     rule.getTaskService().complete(afterBoundaryTask.getId());
 

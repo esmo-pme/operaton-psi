@@ -16,16 +16,15 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios720.eventsubprocess;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ActivityInstance;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate.ThrowBpmnErrorDelegateException;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate;
 
@@ -42,8 +41,8 @@ import static org.operaton.bpm.qa.upgrade.util.ActivityInstanceAssert.describeAc
 @Origin("7.24.0")
 public class NestedInterruptingErrorEventSubprocessScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.2")
@@ -71,8 +70,8 @@ public class NestedInterruptingErrorEventSubprocessScenarioTest {
 
     // then
     Task outerEventSubProcessTask = rule.taskQuery().singleResult();
-    Assert.assertNotNull(outerEventSubProcessTask);
-    Assert.assertEquals("outerEventSubProcessTask", outerEventSubProcessTask.getTaskDefinitionKey());
+    assertThat(outerEventSubProcessTask).isNotNull();
+    assertThat(outerEventSubProcessTask.getTaskDefinitionKey()).isEqualTo("outerEventSubProcessTask");
 
     // and
     rule.getTaskService().complete(outerEventSubProcessTask.getId());
@@ -93,7 +92,7 @@ public class NestedInterruptingErrorEventSubprocessScenarioTest {
     ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
 
     // then
-    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).isNotNull();
     assertThat(activityInstance).hasStructure(
         describeActivityInstanceTree(instance.getProcessDefinitionId())
         // eventSubProcess was previously no scope so it misses here

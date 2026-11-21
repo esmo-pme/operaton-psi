@@ -225,7 +225,7 @@ public class BatchHelper {
   }
 
   /**
-   * Remove all batches and historic batches. Usually called in {@link org.junit.After} method.
+   * Remove all batches and historic batches. Usually called in an {@link org.junit.jupiter.api.AfterEach} method.
    */
   public void removeAllRunningAndHistoricBatches() {
     HistoryService historyService = getHistoryService();

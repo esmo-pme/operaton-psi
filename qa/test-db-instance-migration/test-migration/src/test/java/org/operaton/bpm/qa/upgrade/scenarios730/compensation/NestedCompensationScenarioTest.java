@@ -16,16 +16,17 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios730.compensation;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.history.HistoricActivityInstance;
 import org.operaton.bpm.engine.history.HistoricProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thorben Lindhauer
@@ -35,8 +36,8 @@ import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
 @Origin("7.24.0")
 public class NestedCompensationScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("init.throwCompensate.1")
@@ -49,8 +50,8 @@ public class NestedCompensationScenarioTest {
 
     // then history is written for the remaining activity instances
     HistoricProcessInstance historicProcessInstance = rule.historicProcessInstance();
-    Assert.assertNotNull(historicProcessInstance);
-    Assert.assertNotNull(historicProcessInstance.getEndTime());
+    assertThat(historicProcessInstance).isNotNull();
+    assertThat(historicProcessInstance.getEndTime()).isNotNull();
 
     HistoricActivityInstance subProcessInstance = rule.getHistoryService()
         .createHistoricActivityInstanceQuery()
@@ -58,9 +59,9 @@ public class NestedCompensationScenarioTest {
         .activityId("subProcess")
         .singleResult();
 
-    Assert.assertNotNull(subProcessInstance);
-    Assert.assertNotNull(subProcessInstance.getEndTime());
-    Assert.assertEquals(historicProcessInstance.getId(), subProcessInstance.getParentActivityInstanceId());
+    assertThat(subProcessInstance).isNotNull();
+    assertThat(subProcessInstance.getEndTime()).isNotNull();
+    assertThat(subProcessInstance.getParentActivityInstanceId()).isEqualTo(historicProcessInstance.getId());
 
     HistoricActivityInstance compensationThrowInstance = rule.getHistoryService()
         .createHistoricActivityInstanceQuery()
@@ -68,9 +69,9 @@ public class NestedCompensationScenarioTest {
         .activityId("throwCompensate")
         .singleResult();
 
-    Assert.assertNotNull(compensationThrowInstance);
-    Assert.assertNotNull(compensationThrowInstance.getEndTime());
-    Assert.assertEquals(subProcessInstance.getId(), compensationThrowInstance.getParentActivityInstanceId());
+    assertThat(compensationThrowInstance).isNotNull();
+    assertThat(compensationThrowInstance.getEndTime()).isNotNull();
+    assertThat(compensationThrowInstance.getParentActivityInstanceId()).isEqualTo(subProcessInstance.getId());
 
     HistoricActivityInstance compensationHandlerInstance = rule.getHistoryService()
         .createHistoricActivityInstanceQuery()
@@ -78,8 +79,8 @@ public class NestedCompensationScenarioTest {
         .activityId("undoTask")
         .singleResult();
 
-    Assert.assertNotNull(compensationHandlerInstance);
-    Assert.assertNotNull(compensationHandlerInstance.getEndTime());
-    Assert.assertEquals(subProcessInstance.getId(), compensationHandlerInstance.getParentActivityInstanceId());
+    assertThat(compensationHandlerInstance).isNotNull();
+    assertThat(compensationHandlerInstance.getEndTime()).isNotNull();
+    assertThat(compensationHandlerInstance.getParentActivityInstanceId()).isEqualTo(subProcessInstance.getId());
   }
 }

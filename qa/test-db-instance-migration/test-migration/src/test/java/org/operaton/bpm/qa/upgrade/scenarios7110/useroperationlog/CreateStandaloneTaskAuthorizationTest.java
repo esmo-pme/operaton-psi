@@ -19,10 +19,10 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.useroperationlog;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.AuthorizationService;
 import org.operaton.bpm.engine.HistoryService;
@@ -31,9 +31,9 @@ import org.operaton.bpm.engine.authorization.Permissions;
 import org.operaton.bpm.engine.authorization.Resources;
 import org.operaton.bpm.engine.history.UserOperationLogQuery;
 import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Yana.Vasileva
@@ -43,14 +43,14 @@ public class CreateStandaloneTaskAuthorizationTest {
 
   private static final String USER_ID = "jane" + "CreateStandaloneTask";
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   protected HistoryService historyService;
   protected AuthorizationService authorizationService;
   protected ProcessEngineConfigurationImpl engineConfiguration;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     historyService = engineRule.getHistoryService();
     authorizationService = engineRule.getAuthorizationService();
@@ -59,7 +59,7 @@ public class CreateStandaloneTaskAuthorizationTest {
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
     engineRule.getIdentityService().clearAuthentication();
@@ -86,7 +86,7 @@ public class CreateStandaloneTaskAuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery().taskId("myTaskForUserOperationLog");
 
     // then
-    assertEquals(1, query.count());
+    assertThat(query.count()).isEqualTo(1);
   }
 
 }

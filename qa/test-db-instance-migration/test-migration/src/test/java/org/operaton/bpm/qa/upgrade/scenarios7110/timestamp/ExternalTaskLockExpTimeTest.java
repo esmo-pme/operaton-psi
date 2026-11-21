@@ -18,14 +18,13 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.timestamp;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.operaton.bpm.engine.externaltask.ExternalTask;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -50,6 +49,6 @@ public class ExternalTaskLockExpTimeTest extends AbstractTimestampMigrationTest 
     assertNotNull(externalTask);
 
     // then
-    assertThat(externalTask.getLockExpirationTime(), is(LOCK_EXP_TIME));
+    assertThat(externalTask.getLockExpirationTime()).isEqualTo(LOCK_EXP_TIME);
   }
 }

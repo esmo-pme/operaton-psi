@@ -16,9 +16,9 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios730.sentry;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.CaseService;
 import org.operaton.bpm.engine.ProcessEngine;
@@ -29,13 +29,9 @@ import org.operaton.bpm.engine.impl.interceptor.CommandExecutor;
 import org.operaton.bpm.engine.runtime.CaseInstance;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Roman Smirnov
@@ -45,12 +41,12 @@ import static org.junit.Assert.assertTrue;
 @Origin("7.24.0")
 public class SentryScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   protected CaseService caseService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     ProcessEngine processEngine = rule.getProcessEngine();
     caseService = processEngine.getCaseService();
@@ -71,10 +67,10 @@ public class SentryScenarioTest {
     CaseSentryPartEntity sentryPart = createCaseSentryPartQuery()
       .caseExecutionId(secondStageId)
       .singleResult();
-    assertNotNull(sentryPart);
-    assertFalse(sentryPart.isSatisfied());
-    assertNull(sentryPart.getSourceCaseExecutionId());
-    assertEquals("PI_HumanTask_1", sentryPart.getSource());
+    assertThat(sentryPart).isNotNull();
+    assertThat(sentryPart.isSatisfied()).isFalse();
+    assertThat(sentryPart.getSourceCaseExecutionId()).isNull();
+    assertThat(sentryPart.getSource()).isEqualTo("PI_HumanTask_1");
   }
 
   @Test
@@ -104,11 +100,11 @@ public class SentryScenarioTest {
 
     // then
     CaseInstance caseInstance = rule.caseInstance();
-    assertNotNull(caseInstance);
-    assertTrue(caseInstance.isCompleted());
+    assertThat(caseInstance).isNotNull();
+    assertThat(caseInstance.isCompleted()).isTrue();
 
     caseService.closeCaseInstance(caseInstance.getId());
-    assertNull(rule.processInstanceQuery().singleResult());
+    assertThat(rule.processInstanceQuery().singleResult()).isNull();
   }
 
   // queries /////////////////////////////////

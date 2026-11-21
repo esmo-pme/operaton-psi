@@ -46,7 +46,6 @@ import org.operaton.bpm.engine.test.api.history.removaltime.batch.helper.BatchSe
 import org.operaton.bpm.engine.test.junit5.ProcessEngineExtension;
 import org.operaton.bpm.engine.test.junit5.ProcessEngineTestExtension;
 import org.operaton.bpm.engine.test.junit5.batch.BatchExtension;
-import org.operaton.bpm.engine.test.util.BatchRule;
 import org.operaton.bpm.engine.variable.Variables;
 import org.operaton.bpm.model.bpmn.Bpmn;
 import org.operaton.bpm.model.bpmn.BpmnModelInstance;
@@ -427,9 +426,9 @@ class JobEntityAndJobLogBatchIdTest {
   // HELPER
 
   private void assertProcessedJobs(Batch batch, Map<String, List<Job>> processedJobs) {
-    assertThat(processedJobs.get(BatchRule.SEED_JOB)).extracting("batchId").containsOnly(batch.getId());
-    assertThat(processedJobs.get(BatchRule.EXECUTION_JOBS)).extracting("batchId").containsOnly(batch.getId());
-    assertThat(processedJobs.get(BatchRule.MONITOR_JOB)).extracting("batchId").containsOnly(batch.getId());
+    assertThat(processedJobs.get(BatchExtension.SEED_JOB)).extracting("batchId").containsOnly(batch.getId());
+    assertThat(processedJobs.get(BatchExtension.EXECUTION_JOBS)).extracting("batchId").containsOnly(batch.getId());
+    assertThat(processedJobs.get(BatchExtension.MONITOR_JOB)).extracting("batchId").containsOnly(batch.getId());
   }
 
   private void assertHistoricJobLogs(Batch batch, String expectedBatchType) {

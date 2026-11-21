@@ -59,7 +59,7 @@ import org.operaton.bpm.engine.variable.type.ValueType;
 import static org.operaton.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.*;

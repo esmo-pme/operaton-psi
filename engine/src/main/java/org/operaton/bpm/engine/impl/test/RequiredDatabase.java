@@ -21,11 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import org.operaton.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 
 /**
- * This only works if {@link ProcessEngineRule} or {@link AbstractProcessEngineTestCase} is used.
- * Furthermore, it only checks against the engines managed by these classes, e.g. it cannot prevent
+ * This only works if {@link org.operaton.bpm.engine.test.junit5.ProcessEngineExtension} is used.
+ * Furthermore, it only checks against the engines managed by this extension, e.g. it cannot prevent
  * that a test builds a custom engine against any database.
  *
  * <p>

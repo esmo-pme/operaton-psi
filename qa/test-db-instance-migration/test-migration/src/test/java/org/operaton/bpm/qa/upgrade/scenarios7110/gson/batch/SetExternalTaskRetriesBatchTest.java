@@ -18,18 +18,17 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson.batch;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.batch.Batch;
 import org.operaton.bpm.engine.externaltask.ExternalTask;
 import org.operaton.bpm.engine.runtime.Job;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -38,8 +37,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Origin("7.24.0")
 public class SetExternalTaskRetriesBatchTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initSetExternalTaskRetriesBatch.1")
   @Test
@@ -50,7 +49,7 @@ public class SetExternalTaskRetriesBatchTest {
       .list();
 
     // assume
-    assertThat(externalTasks.size(), is(10));
+    assertThat(externalTasks.size()).isEqualTo(10);
 
     Batch batch = engineRule.getManagementService().createBatchQuery()
       .type(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES)
@@ -78,10 +77,10 @@ public class SetExternalTaskRetriesBatchTest {
       .list();
 
     // then
-    assertThat(externalTasks.size(), is(10));
+    assertThat(externalTasks.size()).isEqualTo(10);
 
     for (ExternalTask externalTask : externalTasks) {
-      assertThat(externalTask.getRetries(), is(22));
+      assertThat(externalTask.getRetries()).isEqualTo(22);
     }
   }
 

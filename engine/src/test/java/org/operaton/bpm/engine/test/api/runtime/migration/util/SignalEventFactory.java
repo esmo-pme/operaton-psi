@@ -18,7 +18,6 @@ package org.operaton.bpm.engine.test.api.runtime.migration.util;
 
 import org.operaton.bpm.engine.ProcessEngine;
 import org.operaton.bpm.engine.runtime.EventSubscription;
-import org.operaton.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.operaton.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
 import org.operaton.bpm.engine.test.junit5.migration.MigrationTestExtension;
 import org.operaton.bpm.model.bpmn.BpmnModelInstance;
@@ -86,11 +85,6 @@ public class SignalEventFactory implements BpmnEventFactory {
       }
 
       engine.getRuntimeService().signalEventReceived(eventSubscription.getEventName(), eventSubscription.getExecutionId());
-    }
-
-    @Override
-    public void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId) {
-      migrationContext.assertEventSubscriptionMigrated(activityId, targetActivityId, SIGNAL_NAME);
     }
 
     @Override

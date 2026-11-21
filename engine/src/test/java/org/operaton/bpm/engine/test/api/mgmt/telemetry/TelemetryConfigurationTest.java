@@ -27,7 +27,7 @@ import org.operaton.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.operaton.bpm.engine.test.RequiredHistoryLevel;
 import org.operaton.bpm.engine.test.junit5.ProcessEngineExtension;
 import org.operaton.bpm.engine.test.junit5.ProcessEngineLoggingExtension;
-import org.operaton.commons.testing.WatchLogger;
+import org.operaton.bpm.engine.test.junit5.WatchLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

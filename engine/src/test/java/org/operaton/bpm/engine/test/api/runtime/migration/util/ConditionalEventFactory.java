@@ -17,7 +17,6 @@
 package org.operaton.bpm.engine.test.api.runtime.migration.util;
 
 import org.operaton.bpm.engine.ProcessEngine;
-import org.operaton.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.operaton.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
 import org.operaton.bpm.engine.test.junit5.migration.MigrationTestExtension;
 import org.operaton.bpm.model.bpmn.BpmnModelInstance;
@@ -78,11 +77,6 @@ public class ConditionalEventFactory implements BpmnEventFactory {
     @Override
     public void trigger(String processInstanceId) {
       engine.getRuntimeService().setVariable(processInstanceId, variableName, variableValue);
-    }
-
-    @Override
-    public void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId) {
-      migrationContext.assertEventSubscriptionMigrated(activityId, targetActivityId, null);
     }
 
     @Override

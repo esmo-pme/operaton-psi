@@ -18,26 +18,26 @@ package org.operaton.bpm.qa.upgrade.scenarios720.multiinstance;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate.ThrowBpmnErrorDelegateException;
 import org.operaton.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ScenarioUnderTest("ParallelMultiInstanceSubprocessScenario")
 @Origin("7.24.0")
 public class ParallelMultiInstanceScenarioTest {
 
-  @Rule
-  public UpgradeTestRule rule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension rule = new UpgradeTestExtension();
 
   @Test
   @ScenarioUnderTest("initNonInterruptingBoundaryEvent.1")
@@ -120,10 +120,10 @@ public class ParallelMultiInstanceScenarioTest {
     rule.getTaskService().complete(miSubprocessTask.getId());
 
     // then
-    Assert.assertEquals(2, rule.taskQuery().count());
+    assertThat(rule.taskQuery().count()).isEqualTo(2);
 
     Task escalatedTask = rule.taskQuery().taskDefinitionKey("escalatedTask").singleResult();
-    Assert.assertNotNull(escalatedTask);
+    assertThat(escalatedTask).isNotNull();
 
     // and
     rule.getTaskService().complete(escalatedTask.getId());

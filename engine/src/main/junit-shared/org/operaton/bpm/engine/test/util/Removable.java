@@ -78,18 +78,6 @@ public final class Removable {
     this.engine = engine;
   }
 
-  /**
-   * Static Creation method.
-   *
-   * @param rule the process engine test rule, non-null.
-   * @return the {@link Removable}
-   */
-  public static Removable of(@NonNull ProcessEngineTestRule rule) {
-    Objects.requireNonNull(rule.processEngineRule);
-
-    return of(rule.processEngineRule.getProcessEngine());
-  }
-
   public static Removable of(ProcessEngine engine) {
     return new Removable(engine);
   }

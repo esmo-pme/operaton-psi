@@ -19,7 +19,6 @@ package org.operaton.bpm.engine.test.api.runtime;
 import java.util.Comparator;
 import java.util.List;
 
-import junit.framework.TestCase;
 
 import org.operaton.bpm.engine.ProcessEngine;
 import org.operaton.bpm.engine.RepositoryService;
@@ -42,6 +41,9 @@ import org.operaton.bpm.engine.runtime.Execution;
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.operaton.bpm.engine.task.Task;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class provides utils to verify the sorting of queries of engine entities.
@@ -541,7 +543,7 @@ public final class TestOrderingUtil {
 
     // and one where the values with null properties are at the end of the list
     boolean trailingNullOrdering = orderingConsistent(actualElements, expectedOrdering, false);
-    TestCase.assertTrue("Ordering not consistent with comparator", trailingNullOrdering);
+    assertTrue(trailingNullOrdering, "Ordering not consistent with comparator");
   }
 
   public static <T> boolean orderingConsistent(List<T> actualElements, NullTolerantComparator<T> expectedOrdering, boolean nullPrecedes) {
@@ -560,7 +562,7 @@ public final class TestOrderingUtil {
 
   public static <T> void verifySortingAndCount(Query<?, T> query, int expectedCount, NullTolerantComparator<T> expectedOrdering) {
     List<T> elements = query.list();
-    TestCase.assertEquals(expectedCount, elements.size());
+    assertEquals(expectedCount, elements.size());
 
     verifySorting(elements, expectedOrdering);
   }

@@ -18,7 +18,7 @@ package org.operaton.bpm.engine.test.api.multitenancy;
 
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
+import org.opentest4j.AssertionFailedError;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

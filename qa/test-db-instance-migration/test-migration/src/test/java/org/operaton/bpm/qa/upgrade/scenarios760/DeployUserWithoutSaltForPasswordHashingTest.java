@@ -16,25 +16,22 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios760;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.identity.User;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ScenarioUnderTest("DeployUserWithoutSaltForPasswordHashingScenario")
 @Origin("7.24.0")
 public class DeployUserWithoutSaltForPasswordHashingTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @Test
   public void testDeployUserWithoutSaltForPasswordHashing() {
@@ -43,9 +40,9 @@ public class DeployUserWithoutSaltForPasswordHashingTest {
                   .createUserQuery()
                   .userId("kermit")
                   .singleResult();
-    assertThat(user, is(not(nullValue())));
+    assertThat(user).isNotNull();
     boolean isPasswordCorrect = engineRule.getIdentityService().checkPassword(user.getId(), "password");
-    assertThat(isPasswordCorrect, is(true));
+    assertThat(isPasswordCorrect).isEqualTo(true);
   }
 
 }

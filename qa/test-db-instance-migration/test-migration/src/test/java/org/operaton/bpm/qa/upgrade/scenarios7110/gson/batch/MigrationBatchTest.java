@@ -18,18 +18,17 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.gson.batch;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.batch.Batch;
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
-import org.operaton.bpm.engine.test.ProcessEngineRule;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
+import org.operaton.bpm.qa.upgrade.UpgradeProcessEngineExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -38,8 +37,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Origin("7.24.0")
 public class MigrationBatchTest {
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("operaton.cfg.xml");
+  @RegisterExtension
+  public UpgradeProcessEngineExtension engineRule = new UpgradeProcessEngineExtension("operaton.cfg.xml");
 
   @ScenarioUnderTest("initMigrationBatch.1")
   @Test
@@ -49,7 +48,7 @@ public class MigrationBatchTest {
       .list();
 
     // assume
-    assertThat(processInstances.size(), is(10));
+    assertThat(processInstances.size()).isEqualTo(10);
 
     String batchId = engineRule.getManagementService().getProperties()
         .get("MigrationBatchScenario.batchId");
@@ -88,7 +87,7 @@ public class MigrationBatchTest {
       .list();
 
     // then
-    assertThat(processInstances.size(), is(0));
+    assertThat(processInstances.size()).isEqualTo(0);
   }
 
 }

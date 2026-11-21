@@ -16,30 +16,29 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios7150.variable;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.operaton.bpm.engine.RuntimeService;
 import org.operaton.bpm.engine.runtime.VariableInstance;
 import org.operaton.bpm.engine.runtime.VariableInstanceQuery;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
-import org.operaton.bpm.qa.upgrade.UpgradeTestRule;
+import org.operaton.bpm.qa.upgrade.UpgradeTestExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ScenarioUnderTest("EmptyStringVariableScenario")
 @Origin("7.24.0")
 public class EmptyStringVariableTest {
 
-  @Rule
-  public UpgradeTestRule engineRule = new UpgradeTestRule();
+  @RegisterExtension
+  public UpgradeTestExtension engineRule = new UpgradeTestExtension();
 
   RuntimeService runtimeService;
 
-  @Before
+  @BeforeEach
   public void assignServices() {
     runtimeService = engineRule.getRuntimeService();
   }
@@ -54,9 +53,9 @@ public class EmptyStringVariableTest {
     VariableInstance variable = variableQuery.singleResult();
 
     // then
-    assertNotNull(variable);
+    assertThat(variable).isNotNull();
     // since the instance is created by a 7.24 engine, the empty string is also kept on Oracle
-    assertEquals("", variable.getValue());
+    assertThat(variable.getValue()).isEqualTo("");
   }
 
 }

@@ -16,15 +16,13 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios7110.timestamp;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.operaton.bpm.engine.history.HistoricJobLog;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -45,10 +43,10 @@ public class HistoricJobLogTimestampsTest extends AbstractTimestampMigrationTest
       .singleResult();
 
     // assume
-    assertThat(historicJobLog, is(notNullValue()));
+    assertThat(historicJobLog).isNotNull();
 
     // then
-    assertThat(historicJobLog.getJobDueDate(), is(TIMESTAMP));
+    assertThat(historicJobLog.getJobDueDate()).isEqualTo(TIMESTAMP);
   }
 
   @ScenarioUnderTest("initJobTimestamps.1")
@@ -64,6 +62,6 @@ public class HistoricJobLogTimestampsTest extends AbstractTimestampMigrationTest
     assertNotNull(historicJobLog);
 
     // then
-    assertThat(historicJobLog.getTimestamp(), is(TIMESTAMP));
+    assertThat(historicJobLog.getTimestamp()).isEqualTo(TIMESTAMP);
   }
 }

@@ -16,14 +16,13 @@
  */
 package org.operaton.bpm.qa.upgrade.scenarios7110.timestamp;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.operaton.bpm.engine.runtime.EventSubscription;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -47,6 +46,6 @@ public class EventSubscriptionCreateTimeTest extends AbstractTimestampMigrationT
     assertNotNull(eventSubscription);
 
     // then
-    assertThat(eventSubscription.getCreated(), is(TIMESTAMP));
+    assertThat(eventSubscription.getCreated()).isEqualTo(TIMESTAMP);
   }
 }

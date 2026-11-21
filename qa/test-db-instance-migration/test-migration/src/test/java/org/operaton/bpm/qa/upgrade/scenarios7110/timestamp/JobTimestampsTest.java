@@ -18,15 +18,14 @@ package org.operaton.bpm.qa.upgrade.scenarios7110.timestamp;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.operaton.bpm.engine.impl.persistence.entity.JobEntity;
 import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.qa.upgrade.Origin;
 import org.operaton.bpm.qa.upgrade.ScenarioUnderTest;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nikola Koevski
@@ -51,7 +50,7 @@ public class JobTimestampsTest extends AbstractTimestampMigrationTest {
     assertNotNull(job);
 
     // then
-    assertThat(job.getDuedate(), is(TIMESTAMP));
+    assertThat(job.getDuedate()).isEqualTo(TIMESTAMP);
   }
 
   @ScenarioUnderTest("initJobTimestamps.1")
@@ -66,6 +65,6 @@ public class JobTimestampsTest extends AbstractTimestampMigrationTest {
     assertNotNull(job);
 
     // then
-    assertThat(job.getLockExpirationTime(), is(LOCK_EXP_TIME));
+    assertThat(job.getLockExpirationTime()).isEqualTo(LOCK_EXP_TIME);
   }
 }

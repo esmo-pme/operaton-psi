@@ -18,7 +18,7 @@ package org.operaton.bpm.engine.test.bpmn.event.signal;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
+import org.opentest4j.AssertionFailedError;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
