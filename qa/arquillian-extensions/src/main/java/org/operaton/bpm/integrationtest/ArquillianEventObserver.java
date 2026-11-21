@@ -37,7 +37,9 @@ import java.util.Map;
 public class ArquillianEventObserver {
 
   private static final String POSTGRES = "postgres";
-  private static final String POSTGRES_VERSION = "14";
+  // downstream: configurable (-Dqa.postgresql.version=18.7) to run the suite on the PostgreSQL version we deploy;
+  // the default stays upstream's 14. Testcontainers uses a local image of that tag before pulling one.
+  private static final String POSTGRES_VERSION = System.getProperty("qa.postgresql.version", "14");
 
   private static final String SQLSERVER = "sqlserver";
   private static final String SQLSERVER_VERSION = "2022-latest";

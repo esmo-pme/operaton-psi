@@ -406,3 +406,13 @@ longer compile. Upstream still ships the JUnit 4 API (`main`, November 2026). Fi
   through `junit:junit`; 5 classes moved to AssertJ. Needs the released engine `1.0.0-beta-5` (downloaded with the
   owner's OK, about 14 MB). `.\mvnw.cmd clean install -f qa/pom.xml -Prolling-update,h2 -pl '!load-test'
   '-Ddatabase.port=19092'`: 56 tests green.
+
+### Test: container tests on the PostgreSQL version we deploy (2026-11-21)
+
+- **Changed (`qa/arquillian-extensions` `ArquillianEventObserver`):** the PostgreSQL version that the Arquillian
+  extension starts through Testcontainers was hard-coded to upstream's `14` (any `-Ddatabase.url` is ignored); now
+  `-Dqa.postgresql.version=<tag>`, default `14`. Testcontainers uses a local image of that tag before pulling one.
+- **Test:** `.\mvnw.cmd clean install -f qa/pom.xml -Pengine-integration,wildfly,postgresql -pl '!load-test'
+  '-Dqa.postgresql.version=18.7'`: 250 tests, 0 failures, 2 skipped (24 min) on `postgres:18.7`; with the default
+  (PostgreSQL 14) the same 250 green, with H2 too.
+- **Drop when:** upstream makes the version configurable or tests the version we deploy.
