@@ -26,11 +26,6 @@
       </dependency>
       <dependency>
         <groupId>org.operaton.commons</groupId>
-        <artifactId>operaton-commons-testing</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.operaton.commons</groupId>
         <artifactId>operaton-commons-typed-values</artifactId>
         <version>${project.version}</version>
       </dependency>

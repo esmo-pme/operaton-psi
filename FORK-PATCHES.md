@@ -342,7 +342,9 @@ longer compile. Upstream still ships the JUnit 4 API (`main`, November 2026). Fi
 
 - **Removed:** `engine/src/main/junit4` (`ProcessEngineRule`, `ProcessEngineTestCase`, `PluggableProcessEngineTest`,
   the JUnit 4 rules) and the `junit4` jar of `operaton-engine`; `engine-dmn` `src/main/junit4` and `src/test/junit4`
-  (`DmnEngineRule`) and its `junit4` jar; `commons/testing` `ProcessEngineLoggingRule` (+ test); the module
+  (`DmnEngineRule`) and its `junit4` jar; the module `commons/testing` (after removing `ProcessEngineLoggingRule`
+  only two unused classes were left; its 6 test-scope users either declare `logback-classic` themselves or get it
+  from Spring Boot, `qa/test-old-engine` now declares it); the module
   `spring-boot-starter/starter-test` (JUnit 4 helpers; `starter-test-junit5` stays, the two webapp-neo modules use
   it now); the JUnit 4 API tests `engine/.../standalone/testing/*` (7 classes); `test/util/BpmnEventTrigger` and
   `BatchSetRemovalTimeRule` (JUnit 5 copies exist). BOM entries for the removed artifacts.
