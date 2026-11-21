@@ -25,7 +25,6 @@ import jakarta.ws.rs.core.Response.Status;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -43,7 +42,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
-@Disabled("See PR#52: Causes an issue resolving operaton-core-internal-dependencies")
+// downstream: enabled again; the WAR no longer resolves Mockito through ShrinkWrap/Maven (the cause of the
+// "operaton-core-internal-dependencies" resolution issue, PR#52), see TomcatServerBootstrap
 public class CustomJacksonDateFormatTest extends AbstractRestServiceTest {
 
   @RegisterExtension

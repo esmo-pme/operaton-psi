@@ -1,4 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Context antiJARLocking="true" antiResourceLocking="true">
-
+<!-- downstream: delegate="true" loads classes parent-first, so the web application uses the test's classes (one
+     MockProvider/Mockito state shared with the test) instead of its own copies from WEB-INF; antiJARLocking was
+     removed in Tomcat 8 -->
+<Context antiResourceLocking="true">
+  <Loader delegate="true"/>
 </Context>

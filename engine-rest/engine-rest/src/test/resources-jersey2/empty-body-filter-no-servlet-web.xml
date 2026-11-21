@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- downstream: Jersey variant of resources-resteasy/empty-body-filter-no-servlet-web.xml (the build runs the REST tests with Jersey only) -->
+<web-app version="6.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="https://jakarta.ee/xml/ns/jakartaee" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+
+  <display-name>operaton rest api</display-name>
+
+  <filter>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <filter-class>org.operaton.bpm.engine.rest.filter.EmptyBodyFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <url-pattern>/rest/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>Engine Api</filter-name>
+    <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
+    <init-param>
+      <param-name>jakarta.ws.rs.Application</param-name>
+      <param-value>org.operaton.bpm.engine.rest.util.container.JaxrsApplication</param-value>
+    </init-param>
+    <init-param>
+      <param-name>jersey.config.servlet.filter.contextPath</param-name>
+      <param-value>/rest</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>Engine Api</filter-name>
+    <url-pattern>/rest/*</url-pattern>
+  </filter-mapping>
+
+</web-app>

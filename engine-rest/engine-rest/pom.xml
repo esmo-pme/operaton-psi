@@ -433,8 +433,10 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <!-- downstream: rest/standalone runs again (Jersey web.xml variants in resources-jersey2); keep only
+                   Surefire's default exclude of inner classes, which a configured <excludes> replaces -->
               <excludes>
-                <exclude>**/rest/standalone/**</exclude>
+                <exclude>**/*$*</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -448,10 +450,9 @@
                 <configuration>
                   <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>${surefire.argLine} -Dfile.encoding=ISO-8859-1</argLine>
-                  <includes>
-                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
-                    <include>**/TaskRestServiceInteractionTest.java</include>
-                  </includes>
+                  <!-- downstream: only the form tests (both CAM-6983 tests *ForDifferentPlatformEncoding are among
+                       them) instead of all 386 tests of the two classes a second time -->
+                  <test>ProcessDefinitionRestServiceInteractionTest#*Form*,TaskRestServiceInteractionTest#*Form*</test>
                 </configuration>
               </execution>
             </executions>

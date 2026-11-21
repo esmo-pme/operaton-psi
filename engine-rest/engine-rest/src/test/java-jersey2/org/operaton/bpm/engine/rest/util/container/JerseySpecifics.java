@@ -25,6 +25,10 @@ import org.junit.jupiter.api.extension.Extension;
 import org.operaton.bpm.engine.rest.CustomJacksonDateFormatTest;
 import org.operaton.bpm.engine.rest.ExceptionHandlerTest;
 import org.operaton.bpm.engine.rest.application.TestCustomResourceApplication;
+import org.operaton.bpm.engine.rest.standalone.NoServletAuthenticationFilterTest;
+import org.operaton.bpm.engine.rest.standalone.NoServletEmptyBodyFilterTest;
+import org.operaton.bpm.engine.rest.standalone.ServletAuthenticationFilterTest;
+import org.operaton.bpm.engine.rest.standalone.ServletEmptyBodyFilterTest;
 
 /**
  * @author Thorben Lindhauer
@@ -40,6 +44,11 @@ public class JerseySpecifics implements ContainerSpecifics {
   static {
     TEST_RULE_FACTORIES.put(ExceptionHandlerTest.class, new EmbeddedServerRuleFactory(new TestCustomResourceApplication()));
     TEST_RULE_FACTORIES.put(CustomJacksonDateFormatTest.class, new ServletContainerRuleFactory("custom-date-format-web.xml"));
+    // downstream: the rest/standalone filter tests had no Jersey web.xml and were excluded from the build
+    TEST_RULE_FACTORIES.put(ServletAuthenticationFilterTest.class, new ServletContainerRuleFactory("auth-filter-servlet-web.xml"));
+    TEST_RULE_FACTORIES.put(NoServletAuthenticationFilterTest.class, new ServletContainerRuleFactory("auth-filter-no-servlet-web.xml"));
+    TEST_RULE_FACTORIES.put(ServletEmptyBodyFilterTest.class, new ServletContainerRuleFactory("empty-body-filter-servlet-web.xml"));
+    TEST_RULE_FACTORIES.put(NoServletEmptyBodyFilterTest.class, new ServletContainerRuleFactory("empty-body-filter-no-servlet-web.xml"));
   }
 
   @Override

@@ -22,9 +22,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.awaitility.core.ConditionTimeoutException;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
@@ -32,8 +34,6 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
-import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
-import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
 
 import org.operaton.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.operaton.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
@@ -86,12 +86,9 @@ public abstract class TomcatServerBootstrap extends AbstractServerBootstrap {
     PomEquippedResolveStage resolver = Maven.configureResolver()
       .useLegacyLocalRepo(true).configureViaPlugin();
 
+    // downstream: no Mockito in WEB-INF/lib. The web application sees the test classpath, which has Mockito; a second
+    // copy made every request fail (ClassCastException for org.mockito.plugins.MockResolver between class loaders).
     WebArchive wa = ShrinkWrap.create(WebArchive.class, "rest-test.war").setWebXML(webXmlPath)
-        .addAsLibraries(resolver.addDependencies(
-            MavenDependencies.createDependency("org.mockito:mockito-core", ScopeType.TEST, false,
-            MavenDependencies.createExclusion("org.hamcrest:hamcrest-core"))).resolve()
-              .withTransitivity().asFile())
-
         .addAsServiceProvider(ProcessEngineProvider.class, MockedProcessEngineProvider.class)
         .add(new ClassLoaderAsset("runtime/tomcat/context.xml"), "META-INF/context.xml")
         .addPackages(true, "org.operaton.bpm.engine.rest");
@@ -103,11 +100,13 @@ public abstract class TomcatServerBootstrap extends AbstractServerBootstrap {
 
     wa.as(ZipExporter.class).exportTo(new File(webAppPath), true);
 
-    tomcat.addWebapp(tomcat.getHost(), contextPath, webAppPath);
+    addWebapp(contextPath, webAppPath);
 
     try {
       await()
-        .atMost((startUpRetries + 1) * 1500L, TimeUnit.MILLISECONDS)
+        // downstream: a first start takes about 10 s; the old limit ((retries + 1) * 1.5 s) cut it off and every
+        // servlet-container test failed
+        .atMost(60, TimeUnit.SECONDS)
         .pollInterval(1500, TimeUnit.MILLISECONDS)
         .until(() -> {
           try {
@@ -116,7 +115,7 @@ public abstract class TomcatServerBootstrap extends AbstractServerBootstrap {
               stop();
               // Re-initialize tomcat for retry if needed
               initializeTomcat(port);
-              tomcat.addWebapp(tomcat.getHost(), contextPath, webAppPath);
+              addWebapp(contextPath, webAppPath);
               return false;
             }
             return true;
@@ -124,12 +123,21 @@ public abstract class TomcatServerBootstrap extends AbstractServerBootstrap {
             stop();
             // Re-initialize tomcat for retry if needed
             initializeTomcat(port);
-            tomcat.addWebapp(tomcat.getHost(), contextPath, webAppPath);
+            addWebapp(contextPath, webAppPath);
             return false;
           }
         });
     } catch (ConditionTimeoutException e) {
       throw new RuntimeException("Failed to start Tomcat after retries", e);
+    }
+  }
+
+  // downstream: the test web.xml files declare every servlet and filter, so Tomcat need not scan the test classpath
+  // (hundreds of JARs) for TLDs and web fragments; that scan took most of the ~10 s start
+  protected void addWebapp(String contextPath, String webAppPath) {
+    Context context = tomcat.addWebapp(tomcat.getHost(), contextPath, webAppPath);
+    if (context.getJarScanner() instanceof StandardJarScanner scanner) {
+      scanner.setScanClassPath(false);
     }
   }
 

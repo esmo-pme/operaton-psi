@@ -27,6 +27,9 @@ public class JerseyTomcatServerBootstrap extends TomcatServerBootstrap {
 
   @Override
   protected void addRuntimeSpecificLibraries(WebArchive wa, PomEquippedResolveStage resolver) {
-    wa.addAsLibraries(resolver.resolve("org.glassfish.jersey.containers:jersey-container-servlet:2.25.1").withTransitivity().asFile());
+    // downstream: add no Jersey to the WAR. The embedded Tomcat's web application sees the test classpath, which
+    // already has Jersey (Jakarta). The former jersey-container-servlet:2.25.1 (javax.servlet) failed to load in
+    // Tomcat 11 (every request 404), and a second Jersey copy in WEB-INF/lib clashes with the classpath one
+    // (ClassCastException between class loaders).
   }
 }
