@@ -22,6 +22,10 @@
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
+    <!-- downstream: 4 test JVMs (H2 in memory, one database per JVM); measured 2026-11-21 on a 12-core laptop: test
+         phase 8:10 -> 4:27 min, 6 JVMs slower again (CPU-bound). Profiles with an external database set 1 below,
+         because forks would share one schema. Override with -Dsurefire.forkCount=N. -->
+    <surefire.forkCount>4</surefire.forkCount>
 
     <!-- We shade artifacts into the jar, so we need to generate a dependency BOM
     for the license book -->
@@ -449,9 +453,10 @@
           </includes>
           <excludes combine.children="append">
             <exclude>**/*TestCase.java</exclude>
+            <!-- downstream: Surefire's default exclude, lost by configuring excludes. Without it, forked runs execute
+                 @Nested classes a second time on their own, without the outer class's state. -->
+            <exclude>**/*$*</exclude>
             <exclude>%regex[.*(${test.excludes}).*Test.*]</exclude>
-            <!-- Nashorn is not part of the JDK anymore in Java 15+ -->
-            <exclude>**/*NashornTest.java</exclude>
           </excludes>
           <dependenciesToScan>
             <dependency>org.operaton.bpm:operaton-bpm-archunit</dependency>
@@ -660,6 +665,10 @@
     <!--  database qa profile -->
     <profile>
       <id>database</id>
+      <properties>
+        <!-- downstream: one test JVM against an external database (forks would share its schema) -->
+        <surefire.forkCount>1</surefire.forkCount>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -881,6 +890,10 @@
     <!-- profile for running testsuite with database table prefix -->
     <profile>
       <id>db-table-prefix</id>
+      <properties>
+        <!-- downstream: not verified with several test JVMs -->
+        <surefire.forkCount>1</surefire.forkCount>
+      </properties>
       <build>
         <plugins>
           <plugin>

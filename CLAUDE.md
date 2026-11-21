@@ -62,6 +62,11 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
 - Run module tests one module per Maven call: `ArchRulesTest` (from `test-utils/archunit`) imports with
   `DoNotIncludeJars`, so when model-api modules are in the same `-pl` reactor their `target/classes` are scanned too
   and it fails on model-api packages.
+- The engine runs its tests in 4 JVMs (`surefire.forkCount=4` in `engine/pom.xml`; `-Dsurefire.forkCount=N` overrides
+  it, the `database` profile sets 1). Test classes must not depend on each other's order or leftovers: a class that
+  leaves engines, deployments or cache entries behind breaks another class in the same JVM. Keep the `**/*$*`
+  exclude (otherwise `@Nested` classes run twice and lose their outer state) and do not name runnable test classes
+  `*TestCase` (excluded). Do not fork `engine-rest` (its servers use the fixed port 38080).
 - LDAP plugin tests (`engine-plugins/identity-ldap`) are skipped unless `-Pdocker` is given (Testcontainers starts
   `osixia/openldap`); run them after any change to the plugin.
 - Helper scripts under `.devenv/scripts` are `.sh`; run them from Git Bash or WSL. GitHub CI (`.github/`) was removed
@@ -76,7 +81,7 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
   `'-Dsurefire.failIfNoSpecifiedTests=false'`.
 - Without `-Dtest`, the engine POM selects tests by the regex `.*(${test.includes}).*Test.*` (`*TestCase.java` is
   excluded): `'-Dtest.includes=bpmn'`, `'-Dtest.excludes=bpmn.async'`, or the profiles `-PtestBpmn` /
-  `-PtestExceptBpmn`. All engine tests take 30+ minutes.
+  `-PtestExceptBpmn`. All engine tests: about 5 min (`test -pl engine`, 4 test JVMs since 2026-11-21; 9 min with one).
 - Test output goes to files, not the console: `engine/target/surefire-reports/<TestClass>-output.txt`.
 - Engine tests use `engine/src/test/resources/operaton.cfg.xml`: database from the `database` module profile (default
   `h2-in-memory`, `jdbc:h2:mem:operaton`), schema auto-created, history `full`, **`jobExecutorActivate=false`**. Jobs

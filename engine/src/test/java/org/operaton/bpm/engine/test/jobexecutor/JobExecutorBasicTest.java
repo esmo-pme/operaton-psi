@@ -49,7 +49,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Tom Baeyens
  */
-class JobExecutorTestCase {
+// downstream: renamed from JobExecutorTestCase, whose name the engine excludes (**/*TestCase.java), so its tests ran
+// only as stray @Nested classes (and not at all once inner classes are excluded)
+class JobExecutorBasicTest {
   @RegisterExtension
   static ProcessEngineExtension engineRule = ProcessEngineExtension.builder().build();
   @RegisterExtension

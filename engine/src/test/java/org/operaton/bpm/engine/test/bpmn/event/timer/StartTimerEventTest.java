@@ -1857,10 +1857,16 @@ class StartTimerEventTest {
         .endEvent()
         .done();
 
-    org.assertj.core.api.Assertions.assertThatThrownBy(() -> testRule.deploy(model))
-        .isInstanceOf(org.operaton.bpm.engine.ProcessEngineException.class)
-        .hasMessageContaining("0 0 0 30 2 ?");
-    assertThat(managementService.createJobQuery().count()).isZero();
+    try {
+      org.assertj.core.api.Assertions.assertThatThrownBy(() -> testRule.deploy(model))
+          .isInstanceOf(org.operaton.bpm.engine.ProcessEngineException.class)
+          .hasMessageContaining("0 0 0 30 2 ?");
+      assertThat(managementService.createJobQuery().count()).isZero();
+    } finally {
+      // the rejected definition was already in the deployment cache when the timer was scheduled; the rollback does
+      // not remove it (Review FINDINGS L-13), and a later class checking for a clean cache in the same JVM would fail
+      processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
+    }
   }
 
 }
