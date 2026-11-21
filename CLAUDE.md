@@ -49,9 +49,12 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
   `.\mvnw.cmd test -Pdistro-wildfly -pl distro/wildfly/subsystem`; the WildFly archive with
   `.\mvnw.cmd clean install '-Pdistro,distro-wildfly' -DskipTests -pl distro/wildfly/distro -am` (quote the comma
   in PowerShell).
-- On this Windows machine the `validate-wildfly-modules` step of `distro/wildfly/modules` fails: it runs `bash`, which
-  resolves to the WSL launcher (no distribution installed), and needs `xmllint`. Skip it with `'-Dexec.skip=true'`
-  and check the module `resource-root` paths by hand (see `..\Artifacts\BUILD-INFO-2.2.2-orange.1.md`).
+- The `validate-wildfly-modules` step of `distro/wildfly/modules` runs `bash validate-modules.sh`, which needs
+  `xmllint`. On this machine plain `bash` is the WSL launcher (no distribution installed); `xmllint` comes from MSYS2
+  (`C:\msys64\ucrt64\bin`, package `mingw-w64-ucrt-x86_64-libxml2`). For WildFly builds put Git Bash and MSYS2 first
+  in `PATH` for that PowerShell session only:
+  `$env:PATH = 'C:\Users\pmetz\AppData\Local\Programs\Git\bin;C:\msys64\ucrt64\bin;' + $env:PATH`.
+  (Fallback without them: `'-Dexec.skip=true'` and check the module `resource-root` paths by hand.)
 - The WildFly archive is `distro/wildfly/distro/target/operaton-bpm-wildfly-<version>.tar.gz`; the handoff to
   deployment (`..\Artifacts\`) is described in `..\Review\PLAN.md`. Check line endings of archive files with `file`,
   not `grep $'\r'` (Git Bash's grep hides carriage returns); `.gitattributes` keeps `distro/**`, `*.sh` and `*.conf`
