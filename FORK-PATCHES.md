@@ -260,3 +260,75 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
 - **Upstream:** no issue or PR (own change; owner decision 2026-11-21). Findings log: `..\Review\FINDINGS.md` O-5.
 - **Test:** `webapps-neo/assembly`: 435 tests, 0 failures on Windows (before: 1 failure).
 - **Drop when:** upstream makes the test or the code platform-independent.
+
+## Test suite: shorter runs, same or better coverage (2026-11-21, owner decision)
+
+Analysis, measurements and rejected options: `..\Review\FINDINGS.md` O-8. JUnit is already 6.0.3 here (property
+`version.junit5`); the 8 remaining JUnit 4 classes test the shipped JUnit 4 API and stay.
+
+### Test: engine tests in 4 JVMs
+
+- **Changed (`engine/pom.xml`):** `surefire.forkCount=4` for the engine (H2 in memory: one database per JVM); the
+  `database` and `db-table-prefix` profiles set it back to 1 (an external database would be shared by all JVMs).
+  `-Dsurefire.forkCount=N` overrides it. Measured on this laptop (Core Ultra 5 235U, 12 cores, power-limited): test
+  phase 8:10 -> 3:57 min, whole `test -pl engine` 9:17 -> 4:58 min (5:46 in a second run); 6 JVMs were slower
+  than 4.
+- **Needed for it:**
+  - `<exclude>**/*$*</exclude>` restored in the engine's Surefire excludes (Surefire's default, lost by configuring
+    `excludes`). Without it forked runs execute `@Nested` classes a second time on their own, without the state of
+    the outer class: `ProcessEngineExtensionEngineRetentionTest` failed, and tests ran twice.
+  - `jobexecutor/JobExecutorTestCase` renamed to `JobExecutorBasicTest`: the engine excludes `**/*TestCase.java`, so
+    its 5 tests had only ever run as stray nested classes (and would have been lost with the exclude above).
+  - `StartTimerEventTest.shouldRejectDeploymentOfCronCycleWithoutNextExecution` (F-6) discards the process
+    definition cache afterwards: the rejected definition stays cached after the rollback (FINDINGS L-13), and a later
+    class in the same JVM failed its clean-cache check (`ProcessEngineRuleJunit4Test`) once the class order changed.
+- **Test:** full engine suite with 4 JVMs green twice: 16,260 tests (16,265 before: minus the 4 deleted duplicates and
+  1 fixture class that only counted as a stray skip).
+- **Drop when:** never (local build setting); re-measure on other hardware.
+
+### Test: dead and duplicate tests removed
+
+- `engine/.../test/jobexecutor/BackoffJobAcquisitionStrategyTest` (4 tests): copy of
+  `impl/jobexecutor/BackoffJobAcquisitionStrategyTest`, which has the same constants and covers every assertion.
+- `engine/src/test/junit5/.../deployment/ProcessEngineExtensionDeploymentIdAccess`: 2 empty `@Test` methods, never
+  run (name does not match the include pattern).
+- Nashorn tests, excluded in every build: `engine` `ScriptTaskNashornTest`, `engine-spring` `ScriptTaskNashornTest`
+  (also `@Disabled`), `spin/core` `JavascriptScriptExtensionNashornTest`, 14 classes under `.../javascript/nashorn/` in
+  `spin/dataformat-json-jackson` and `spin/dataformat-xml-dom`, with their scripts, the exclude entries, and the
+  `nashorn-core` test dependency of the three spin modules (their JavaScript tests name `graal.js` explicitly).
+  Kept: `nashorn-core` in `engine-spring` (its tests use the generic name `javascript`) and the `qa` Nashorn test
+  (runs on Tomcat).
+- 5 engine test configurations referenced nowhere: `cmmn.disabled`, `customIdentitySession-`, `deploy.diagram`,
+  `globalretries`, `passwordpolicy.custom` `*operaton.cfg.xml`.
+- `engine-rest`: `src/test/java-wink`, `resources-wink` (never on the build path) and `resources-resteasy` (never on
+  the build path; its filter configurations now exist as Jersey variants, see below).
+- **Test:** engine as above; `spin/core` 18, `spin/dataformat-json-jackson` 681, `spin/dataformat-xml-dom` 652,
+  `engine-spring` 75 tests green.
+- **Drop when:** never.
+
+### Test: engine-rest filter tests run again; encoding re-run trimmed
+
+- **Restored coverage:** the `jersey3` profile excluded `**/rest/standalone/**` because the filter tests had only
+  RESTEasy `web.xml` files, and the Tomcat test container no longer worked after the Jakarta migration. Now:
+  - Jersey variants `auth-filter-(no-)servlet-web.xml` and `empty-body-filter-(no-)servlet-web.xml` in
+    `src/test/resources-jersey2`, registered in `JerseySpecifics`;
+  - `TomcatServerBootstrap`: start limit 60 s (was `(retries + 1) * 1.5 s`, less than one start), no classpath scan
+    for TLDs/web fragments (the test `web.xml` files declare everything), no Mockito copy in the WAR;
+    `JerseyTomcatServerBootstrap` adds no Jersey to the WAR (was `jersey-container-servlet:2.25.1`, javax.servlet);
+    `runtime/tomcat/context.xml` loads classes parent-first, so the application shares the test's mocks;
+  - `CustomJacksonDateFormatTest` enabled again (it was disabled for the ShrinkWrap resolution removed above);
+  - `AbstractEmptyBodyFilterTest.testBodyIsNullAndContentTypeIsNull` is skipped under Jersey (answers 500; RESTEasy,
+    the JAX-RS runtime of WildFly, answers the expected 415).
+  Result: 56 more tests (2 of them skipped, see above), among them the 14 `ProcessEngineAuthenticationFilter`
+  tests (relevant since REST authentication is enabled on WildFly).
+- **Trimmed:** the `encoding-test` execution (ISO-8859-1, CAM-6983) runs only the form tests of
+  `ProcessDefinitionRestServiceInteractionTest` and `TaskRestServiceInteractionTest` (102, including both
+  `*ForDifferentPlatformEncoding` tests) instead of all 386 again; it now uses `<test>` (Surefire 3.6 rejects method
+  filters in `<includes>`). Saves only seconds: the second JVM start remains.
+- **Test:** `engine-rest/engine-rest`: 3,691 + 102 tests, 0 failures, 3 skipped.
+- **Drop when:** upstream repairs the servlet-container tests itself.
+
+### Test: WildFly subsystem test cleanup runs
+
+- `JBossSubsystemXMLTest.tearDown()` (calls the framework's `cleanup()`) had lost its `@AfterEach`; restored.
+  Subsystem tests (`-Pdistro-wildfly`): 28 green, 1 skipped.

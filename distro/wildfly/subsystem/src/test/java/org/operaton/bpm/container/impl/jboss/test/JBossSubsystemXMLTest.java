@@ -35,6 +35,7 @@ import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.threads.EnhancedQueueExecutor;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -165,6 +166,8 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     super.initializeParser();
   }
 
+  // downstream: @AfterEach was missing (lost in the JUnit 5 migration), so the framework's cleanup never ran
+  @AfterEach
   void tearDown () throws Exception {
     super.cleanup();
   }
