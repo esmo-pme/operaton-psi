@@ -98,11 +98,21 @@
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <forkCount>${surefire.forkCount}</forkCount>
             <argLine>@{argLine} ${surefire.localeArgs}</argLine>
+            <!-- downstream: no tests run on JUnit 4. Surefire adds the vintage engine on its own when junit:junit is
+                 on the test class path (for example through a third-party test framework); exclude it. -->
+            <excludeJUnit5Engines>
+              <excludeJUnit5Engine>junit-vintage</excludeJUnit5Engine>
+            </excludeJUnit5Engines>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <excludeJUnit5Engines>
+              <excludeJUnit5Engine>junit-vintage</excludeJUnit5Engine>
+            </excludeJUnit5Engines>
+          </configuration>
           <executions>
             <execution>
               <goals>

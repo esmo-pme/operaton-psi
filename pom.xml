@@ -79,6 +79,27 @@
               </rules>
             </configuration>
           </execution>
+          <!-- downstream: JUnit 4 is removed from this fork; keep it from coming back, directly or transitively.
+               A module that needs it as a third-party dependency allows it with <includes> (see the WildFly
+               subsystem). -->
+          <execution>
+            <id>ban-junit4</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>junit:junit</exclude>
+                    <exclude>org.junit.vintage:*</exclude>
+                    <exclude>com.tngtech.archunit:archunit-junit4</exclude>
+                  </excludes>
+                  <message>JUnit 4 is not used in this fork. Write tests with JUnit Jupiter (JUnit 6).</message>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -473,13 +494,6 @@
                 </rule>
                 <rule>
                   <groupId>org.junit.platform</groupId>
-                  <ignoreVersion>
-                    <type>range</type>
-                    <version>[6,)</version>
-                  </ignoreVersion>
-                </rule>
-                <rule>
-                  <groupId>org.junit.vintage</groupId>
                   <ignoreVersion>
                     <type>range</type>
                     <version>[6,)</version>

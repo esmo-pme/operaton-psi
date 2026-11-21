@@ -90,8 +90,12 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
 - `@Deployment` without resources deploys `<package>/<TestClass>.<testMethod>.bpmn20.xml` (or `<TestClass>.bpmn20.xml`
   at class level) from the test's package.
 - New tests: JUnit 5 with `@RegisterExtension ProcessEngineExtension` and AssertJ assertions; Mockito for mocks. Test
-  support ships in the engine artifact: `engine/src/main/junit5`, `engine/src/main/junit-shared` (`@Deployment`,
-  `TestHelper`) and legacy `engine/src/main/junit4`.
+  support ships in the engine artifact: `engine/src/main/junit5` and `engine/src/main/junit-shared` (`@Deployment`,
+  `TestHelper`), published as classifier `junit6` (identical copy: `junit5`).
+- JUnit 4 is removed from this fork (2026-11-21): no JUnit 4 API (`ProcessEngineRule`, `DmnEngineRule`,
+  `starter-test`), no vintage engine (Surefire and Failsafe exclude it), and the Enforcer rule `ban-junit4` in the
+  root `pom.xml` fails the build if `junit:junit` comes back. The only allowed exception is the WildFly subsystem,
+  whose third-party test framework needs the jar (its tests run on Jupiter via `AbstractJupiterSubsystemBaseTest`).
 - Other databases: profiles in `database/pom.xml`, see `TESTING.md` (for example
   `-Pdatabase,postgresql -Ddatabase.url=...`, or `-Ppostgresql,testcontainers`). The upstream PostgreSQL profile uses
   PostgreSQL 14.

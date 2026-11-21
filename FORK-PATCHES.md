@@ -264,7 +264,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
 ## Test suite: shorter runs, same or better coverage (2026-11-21, owner decision)
 
 Analysis, measurements and rejected options: `..\Review\FINDINGS.md` O-8. JUnit is already 6.0.3 here (property
-`version.junit5`); the 8 remaining JUnit 4 classes test the shipped JUnit 4 API and stay.
+`version.junit5`). JUnit 4 was removed afterwards (owner decision, next section).
 
 ### Test: engine tests in 4 JVMs
 
@@ -332,3 +332,71 @@ Analysis, measurements and rejected options: `..\Review\FINDINGS.md` O-8. JUnit 
 
 - `JBossSubsystemXMLTest.tearDown()` (calls the framework's `cleanup()`) had lost its `@AfterEach`; restored.
   Subsystem tests (`-Pdistro-wildfly`): 28 green, 1 skipped.
+
+## JUnit 4 removed (2026-11-21, owner decision)
+
+The owner wants no outdated test technology in this fork, accepting that JUnit 4 tests written against Operaton no
+longer compile. Upstream still ships the JUnit 4 API (`main`, November 2026). Findings: `..\Review\FINDINGS.md` O-9.
+
+### JUnit 4 API and its tests deleted
+
+- **Removed:** `engine/src/main/junit4` (`ProcessEngineRule`, `ProcessEngineTestCase`, `PluggableProcessEngineTest`,
+  the JUnit 4 rules) and the `junit4` jar of `operaton-engine`; `engine-dmn` `src/main/junit4` and `src/test/junit4`
+  (`DmnEngineRule`) and its `junit4` jar; `commons/testing` `ProcessEngineLoggingRule` (+ test); the module
+  `spring-boot-starter/starter-test` (JUnit 4 helpers; `starter-test-junit5` stays, the two webapp-neo modules use
+  it now); the JUnit 4 API tests `engine/.../standalone/testing/*` (7 classes); `test/util/BpmnEventTrigger` and
+  `BatchSetRemovalTimeRule` (JUnit 5 copies exist). BOM entries for the removed artifacts.
+- **Moved to `junit-shared`** (no JUnit dependency): `TypedValueAssert`, `Removable` (without its rule overload),
+  `RemoveAfter`, `AssertUtil`.
+- **JUnit 5 tests that still used JUnit 3/4 classes:** `junit.framework.TestCase.assert*` -> Jupiter `Assertions`,
+  `junit.framework.AssertionFailedError` -> `org.opentest4j.AssertionFailedError`, `org.junit.Assume` -> Jupiter
+  `Assumptions`, `AuthorizationTestRule.asParameters` -> `AuthorizationTestExtension.asParameters`, `BatchRule`
+  constants -> `BatchExtension`, the `MigrationTestRule` overloads of the migration helpers removed, the
+  `TemporaryFolder` overload of `OperatonFormUtils` removed (engine, engine-rest).
+- **`TelemetryConfigurationTest.shouldNotLogDefaultTelemetryValue`** used `org.operaton.commons.testing.WatchLogger`,
+  which the JUnit 5 logging extension ignores: no log was captured and the test could not fail. Now uses the
+  extension's own `WatchLogger`.
+- **`ArchRulesTest`** (`test-utils/archunit`, run by `dependenciesToScan` in several modules) ran on the JUnit 4
+  `ArchUnitRunner`; now a plain Jupiter test on the ArchUnit core library (no `archunit-junit5` download needed).
+  It now also runs where `junit` was excluded and the JUnit 4 runner therefore never started (model-api, engine-spring):
+  in model-api it found the three `*ParserFactory` SPIs returning `impl` parser classes (upstream design, FINDINGS
+  L-14), now named exceptions of the rule.
+- **WildFly subsystem tests:** WildFly's `AbstractSubsystemBaseTest` (wildfly-core 33) is written for JUnit 4; its
+  `testSubsystem`/`testSchema` ran only because Surefire adds the vintage engine on its own when `junit:junit` is on
+  the class path. New `AbstractJupiterSubsystemBaseTest` calls them (and the framework's `initializeParser`/`cleanup`)
+  from Jupiter methods; `BpmPlatformSubsystemWithExpressionsTest` uses `@BeforeAll`/`@AfterAll`. `junit:junit` stays
+  on this module's test class path as WildFly's dependency (the only allowed exception).
+- **Unused `junit` dependencies removed:** `freemarker-template-engine`, `jakarta-ee/jobexecutor-ra`,
+  `qa/test-old-engine`, `starter-qa` runtime, the javadoc `additionalDependency` of `spin/dataformat-all`, the managed
+  version in `bom/internal-dependencies`, the vintage rule of the versions plugin. `junit` *exclusions* stay.
+- **Guard against a return:** Enforcer execution `ban-junit4` in the root `pom.xml` (bans `junit:junit`,
+  `org.junit.vintage:*`, `archunit-junit4`, also transitively; the subsystem allows `junit:junit` in test scope), and
+  Surefire/Failsafe exclude the `junit-vintage` engine in `parent/pom.xml`.
+- **Drop when:** never (owner decision).
+
+### Instance-migration upgrade tests repaired (from upstream `main`) and moved to JUnit 5
+
+- **Problem:** in `v2.2.2` `qa/test-db-instance-migration` cannot run: the test POM uses an undefined property
+  (`version.operaton.dbscheme`), 34 test classes miss their imports of `ScenarioUnderTest`/`Origin`, and the second
+  fixture fails with "No suitable driver" (`exec:java` runs both fixtures in one JVM). Upstream `main` has repaired
+  the suite (property `operaton.dbscheme.current.version`, imports, explicit driver loading, scenarios a current
+  engine cannot reproduce deleted, README) but still on JUnit 4.
+- **Taken over from upstream `main` (state 2026-11-20, `e50580d5`):** test sources of `test-migration`, the fixture
+  sources of `test-fixture-724`/`-725` (32 files deleted, 79 changed), the POM property. Not taken: the new
+  `test-fixture-726` (schema 7.26, upstream 2.3), the fixture engine versions 2.1.6/2.2.1 (we keep 2.1.2/2.2.2, which
+  are already in the local Maven repository).
+- **JUnit 5:** 79 test classes on `UpgradeTestExtension` / new `UpgradeProcessEngineExtension` (instance fields,
+  one extension per test like the JUnit 4 rule); JUnit 4 and Hamcrest assertions -> AssertJ; `UpgradeTestRule`
+  deleted; `test-db-util` uses the `junit6` engine jar. `UpgradeProcessEngineExtension.afterEach` is a copy of
+  `ProcessEngineExtension.afterEach` without clearing the user operation log (the fixtures create entries that 6
+  tests read; all classes share one database) -- keep it in step with the engine. `UpgradeTestExtension` extends it,
+  so the rolling-update tests no longer clear that log either (they do not use it; that suite was not run).
+- **Test:** `.\mvnw.cmd clean install -f qa/pom.xml -Pinstance-migration,h2 -pl '!load-test' '-Ddatabase.port=19092'`
+  (port 18080 is taken by the Deployment test stack): 291 tests, 0 failures, 4 skipped -- before (JUnit 4, after the
+  repair) and after (JUnit 5), identical per class.
+- **Drop when:** upstream ships the repaired suite on JUnit 5 in a release we rebase onto.
+- **Test results (2026-11-21):** full build `install -DskipTests` green incl. the Enforcer rule in every module;
+  engine 16,237 tests green (16,260 minus the 23 tests of the deleted JUnit 4 API); engine-dmn 427, engine-rest
+  3,691 + 102, engine-spring 76, engine-cdi 61, model-api 1,105 / 302 / 289, typed-values 59, freemarker 10,
+  starter 186, webapp-neo-core 50, webapp-neo 2, WildFly subsystem 28 (1 skipped, as before), upgrade suite 291
+  (4 skipped) -- all green.
