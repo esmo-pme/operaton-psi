@@ -205,6 +205,19 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   `-Pdistro-wildfly`.
 - **Drop when:** upstream wires the thread factory.
 
+### F-10: LDAP user query by group pages again (2026-11-21)
+
+- **Changed (`engine-plugins/identity-ldap`):** `LdapIdentityProviderSession.findUsersFromGroupMembers` applies
+  `firstResult` and `maxResults` to the group's member list again (condition
+  `userList.size() < maxResults && memberIndex >= firstResult`, as before upstream commit `eb8a88e2b1`, PR #2157,
+  "reduce cognitive complexity", which dropped it). Before the fix `createUserQuery().memberOfGroup(..).listPage(..)`
+  returned all members on every page and looked up every member in LDAP for each page. `addMembersToList` is
+  unchanged: its skip does not consume elements, so the member list holds all members, as before the refactoring.
+- **Upstream:** no issue or PR (own fix; owner decision 2026-11-21). Findings log: `..\Review\FINDINGS.md` F-10.
+- **Test:** `LdapUserQueryTest.testPaginationWithMemberOfGroup` (existing; runs only with `-Pdocker`, OpenLDAP via
+  Testcontainers): fails without the fix (12 users instead of 2), passes with it.
+- **Drop when:** upstream restores the paging.
+
 ### Test: `QuerySessionFactoryTest` passes on Windows (2026-11-21)
 
 - **Changed (test only):** `webapps-neo/assembly` `QuerySessionFactoryTest.buildMappingsShouldBuildValidXml` expects

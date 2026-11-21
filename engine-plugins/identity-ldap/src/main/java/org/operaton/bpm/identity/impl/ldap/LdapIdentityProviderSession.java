@@ -191,9 +191,14 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     List<User> userList = new ArrayList<>();
     String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
 
+    // downstream (F-10): restore the paging that upstream PR #2157 (commit eb8a88e2b1) dropped. groupMembers holds
+    // all members (addMembersToList does not consume skipped elements), so apply firstResult and maxResults here,
+    // as before the refactoring; this also avoids one LDAP lookup per member outside the requested page.
     for (int memberIndex = 0; memberIndex < groupMembers.size(); memberIndex++) {
-      String memberId = groupMembers.get(memberIndex);
-      findUserForMember(query, userBaseDn, memberId).ifPresent(userList::add);
+      if (userList.size() < query.getMaxResults() && memberIndex >= query.getFirstResult()) {
+        String memberId = groupMembers.get(memberIndex);
+        findUserForMember(query, userBaseDn, memberId).ifPresent(userList::add);
+      }
     }
 
     return userList;
