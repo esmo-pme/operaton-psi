@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -41,6 +42,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("java:S5960")
 class RestJaxRs2IT extends AbstractWebIntegrationTest {
+
+  // downstream: the engine-rest WAR for WildFly requires HTTP Basic authentication (FORK-PATCHES "REST API requires
+  // authentication on WildFly"); authenticate as the demo user of the deployed invoice example. Runs after
+  // AbstractWebIntegrationTest.setUpClass, which resets the client configuration.
+  @BeforeAll
+  static void authenticateRestClient() {
+    Unirest.config().setDefaultBasicAuth("demo", "demo");
+  }
 
   private static final String ENGINE_DEFAULT_PATH = "engine/default";
   private static final String FETCH_AND_LOCK_PATH = ENGINE_DEFAULT_PATH + "/external-task/fetchAndLock";

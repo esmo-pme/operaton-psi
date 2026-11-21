@@ -416,3 +416,17 @@ longer compile. Upstream still ships the JUnit 4 API (`main`, November 2026). Fi
   '-Dqa.postgresql.version=18.7'`: 250 tests, 0 failures, 2 skipped (24 min) on `postgres:18.7`; with the default
   (PostgreSQL 14) the same 250 green, with H2 too.
 - **Drop when:** upstream makes the version configurable or tests the version we deploy.
+
+### Test: webapp container tests with the protected REST WAR and on PostgreSQL (2026-11-21)
+
+- **`RestIT`, `RestJaxRs2IT` (`qa/integration-tests-webapps`):** they call the REST API without credentials and
+  failed with 401 against our WildFly REST WAR (Basic authentication, entry above); proven by a run with the
+  unchanged `v2.2.2` `web.xml` (14 of 14 green). They now authenticate as `demo`, the user of the invoice example the
+  suite deploys anyway, so they test the protected WAR.
+- **`integration-tests-webapps/pom.xml` (WildFly profile):** passes `databaseType` like `integration-tests-engine`;
+  without it no database container starts and the engine gets an empty connection URL on every database except H2.
+- **Test:** chromedriver 157.0.8103.79 (owner-approved download, kept in `~\.cache\chromedriver\`), Selenium Manager
+  offline (`SE_OFFLINE=true`, `SE_AVOID_STATS=true`, `-Dwebdriver.chrome.driver=...`):
+  `-Pwebapps-integration,wildfly,h2 '-Ddatabase.port=19092'` 31 green; `-Pwebapps-integration,wildfly,postgresql
+  '-Dqa.postgresql.version=18.7'` 31 green.
+- **Drop when:** upstream changes the tests (auth) or the POM (`databaseType`).

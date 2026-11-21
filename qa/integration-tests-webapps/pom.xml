@@ -352,6 +352,9 @@
                   <arquillian.launch>wildfly</arquillian.launch>
                   <selenium.screenshot.directory>${project.build.directory}/selenium-screenshots</selenium.screenshot.directory>
                   <wildfly.runtime.location>${wildfly.runtime.location}</wildfly.runtime.location>
+                  <!-- downstream: as in integration-tests-engine; without it the Arquillian extension starts no database
+                       container and the engine gets an empty connection URL on every database except H2 -->
+                  <databaseType>${database.type}</databaseType>
                 </systemPropertyVariables>
                 <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
               </configuration>

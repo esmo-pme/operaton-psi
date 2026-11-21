@@ -27,6 +27,7 @@ import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,14 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class RestIT extends AbstractWebIntegrationTest {
+
+  // downstream: the engine-rest WAR for WildFly requires HTTP Basic authentication (FORK-PATCHES "REST API requires
+  // authentication on WildFly"); authenticate as the demo user of the deployed invoice example. Runs after
+  // AbstractWebIntegrationTest.setUpClass, which resets the client configuration.
+  @BeforeAll
+  static void authenticateRestClient() {
+    Unirest.config().setDefaultBasicAuth("demo", "demo");
+  }
 
   private static final String ENGINE_DEFAULT_PATH = "engine/default";
 
