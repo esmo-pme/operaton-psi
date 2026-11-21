@@ -253,4 +253,17 @@ public class JobExecutorLogger extends ProcessEngineLogger {
     logDebug("040", "Arithmetic exception occurred while computing total queue capacity for logging.");
   }
 
+  // downstream: JobExecutorDeploymentRegistrationPlugin (codes 041/042 are not used upstream)
+  public void registeredDeploymentsForJobExecutor(String processEngine, int registered, int skipped) {
+    logInfo("041",
+        "Registered {} deployments with the deployment-aware job executor of process engine '{}' "
+            + "({} process application deployments left to their applications).",
+        registered, processEngine, skipped);
+  }
+
+  public void deploymentRegistrationNotNeeded(String processEngine) {
+    logInfo("042",
+        "Job executor of process engine '{}' is not deployment-aware; no deployments to register.", processEngine);
+  }
+
 }
