@@ -60,7 +60,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   `..\Review\FINDINGS.md` / `..\Artifacts\BUILD-INFO-*.md`).
 - **Drop when:** never needed on Linux/macOS; keep it as long as downstream is built on Windows.
 
-### Version `2.2.2-orange.1` (2026-11-20)
+### Version `2.2.2-orange.N` (2026-11-20, now `2.2.2-orange.2`)
 
 - **Changed:** project version `2.2.2` → `2.2.2-orange.1` in every reactor POM (`versions:set`), the non-reactor
   `distro/run` POMs, `engine-rest/docs` and `webapps/frontend` `package.json`, and the root entries of their
@@ -77,7 +77,8 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   engine treats the version as an opaque string (`ProductPropertiesUtil`, `ParseUtil`, Spring Boot
   `OperatonBpmVersion`); nothing parses it as `x.y.z`.
 - **Verified:** `.\mvnw.cmd validate` succeeds for all 130 reactor projects at `2.2.2-orange.1`.
-- **Drop when:** never; set the next number (`2.2.2-orange.2`) for each build handed to deployment, and a new base
+- **History:** `orange.1` 2026-11-20 (first handoff); `orange.2` 2026-11-21 (adds F-10), same 155 files.
+- **Drop when:** never; set the next number (`2.2.2-orange.3`) for each build handed to deployment, and a new base
   version (for example `2.2.3-orange.1`) when taking a newer upstream tag.
 
 ### `.gitignore` additions (2026-11-20)
