@@ -1,1 +1,0 @@
-order = S(input, "application/xml").mapTo("org.operaton.spin.xml.mapping.Order");

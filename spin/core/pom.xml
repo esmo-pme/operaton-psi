@@ -24,11 +24,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.openjdk.nashorn</groupId>
-      <artifactId>nashorn-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython</artifactId>
       <scope>test</scope>
@@ -105,7 +100,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes combine.children="append">
-            <exclude>**/*NashornTest.java</exclude>
             <!-- clone not supported -->
             <exclude>**/DataFormatLoadingTest.java</exclude>
           </excludes>

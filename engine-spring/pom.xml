@@ -164,10 +164,6 @@
           <dependenciesToScan>
             <dependency>org.operaton.bpm:operaton-bpm-archunit</dependency>
           </dependenciesToScan>
-          <!-- Nashorn is not part of the JDK anymore in Java 15+ -->
-          <excludes>
-            <exclude>**/*NashornTest.java</exclude>
-          </excludes>
         </configuration>
       </plugin>
       <plugin>
