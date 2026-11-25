@@ -1,7 +1,7 @@
 # Changes on branch 2.2.2-orange
 
-Folder: `C:\Users\pmetz\repos\Operaton\downstream`. Base: upstream tag `v2.2.2` (commit `76a6873d`). The branch stays
-local and is never pushed. "Upstream" is the official Operaton project, "downstream" is this local copy.
+Folder: `C:\Users\pmetz\repos\operaton-psi`. Base: upstream tag `v2.2.2` (commit `76a6873d`). The branch is pushed only to the
+owner's fork (`origin`, esmo-pme/operaton-psi), never to `main`. "Upstream" is the official Operaton project, "downstream" is this copy.
 
 Each entry: what changed, why, upstream issue (if any), the test that proves it, and when the change can be dropped.
 
@@ -57,7 +57,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   the machine's setting (e.g. `mvnw.cmd` stays CRLF).
 - **Verified:** after re-checkout the folders are LF in the working tree and `git status` is clean apart from the new
   file; the WildFly distribution build passes the webapps frontend (see the build entry in
-  `..\Review\FINDINGS.md` / `..\Artifacts\BUILD-INFO-*.md`).
+  `..\operaton-dev\Review\FINDINGS.md` / `Artifacts\BUILD-INFO-*.md` on the share `\\store.esmo-ag.de\users\pmetz\Operaton-Orange`).
 - **Drop when:** never needed on Linux/macOS; keep it as long as downstream is built on Windows.
 
 ### Version `2.2.2-orange.N` (2026-11-20, now `2.2.2-orange.3`)
@@ -104,7 +104,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   handling skips the vanished job.
 - **Upstream:** issue [#4017](https://github.com/operaton/operaton/issues/4017), open PR
   [4018](https://github.com/operaton/operaton/pull/4018) (commits `bc1bc01543` and `5e46da064b` by shardtVLH), taken
-  over unchanged; not merged upstream on 2026-11-20. Findings log: `..\Review\FINDINGS.md` F-2.
+  over unchanged; not merged upstream on 2026-11-20. Findings log: `..\operaton-dev\Review\FINDINGS.md` F-2.
 - **Not covered (as in the PR):** `ensureParentInitialized` with prefetch *disabled* can still return a `null` parent
   in the same race; with the default (prefetch enabled) it goes through the fixed `ensureExecutionTreeInitialized`.
 - **Test:** `engine/src/test/java/org/operaton/bpm/engine/test/concurrency/CompetingProcessInstanceDeletionTest.java`
@@ -126,7 +126,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
 - **Upstream:** draft PR [3110](https://github.com/operaton/operaton/pull/3110) (commit `d4e35353a2` by Julian Haupt,
   backported from Fluxnova commit `0e8e2ec390` by Sowmya, HL), taken over unchanged except the log code: the PR uses
   `111`, which downstream already uses for F-2, so downstream uses `112`. No upstream issue. Findings log:
-  `..\Review\FINDINGS.md` F-3.
+  `..\operaton-dev\Review\FINDINGS.md` F-3.
 - **Test:** the PR's `TaskQueryTest.testInitializeFormKeyWithInvalidExpressionReturnsNullForSingleTask` and
   `...DoesNotBlockTaskListRetrieval` with `oneTaskWithInvalidFormKeyExpressionProcess.bpmn20.xml`: both fail without
   the fix (`ProcessEngineException: Unknown property used in expression`), pass with it. `TaskQueryTest` and all
@@ -149,7 +149,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   long". With our default English messages nothing changes.
 - **Upstream:** issue [#570](https://github.com/operaton/operaton/issues/570), open PR
   [4073](https://github.com/operaton/operaton/pull/4073) (commit `345d363be1` by Tim Zöller), taken over unchanged.
-  Findings log: `..\Review\FINDINGS.md` F-4.
+  Findings log: `..\operaton-dev\Review\FINDINGS.md` F-4.
 - **Test:** the PR's additions to `ExceptionUtilTest` (German messages per database, Turkish locale, no message):
   11 of 29 cases fail without the fix, all pass with it. Error-code, identity and variable tests (119 tests) green.
   Full engine suite with the fix: 16255 tests, 0 failures, 0 errors, 89 skipped.
@@ -161,7 +161,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   elapsed time, instead of `DatatypeFactory.newDuration(long millis)`. That constructor turns milliseconds into
   years/months/days counted from 1970-01-01, so `P5W` became `P1M4D` and was 32 to 35 days long depending on the
   start date (`P52W` up to 367 days); start/end intervals repeated days off. `P5W` now behaves exactly like `P35D`.
-- **Upstream:** no issue or PR (own fix; found by the code inspection). Findings log: `..\Review\FINDINGS.md` F-5.
+- **Upstream:** no issue or PR (own fix; found by the code inspection). Findings log: `..\operaton-dev\Review\FINDINGS.md` F-5.
 - **Test:** `DurationHelperTest.shouldAddWeeksAsSevenDaysFromAnyStartDate`, `shouldRepeatWeeksAsSevenDaysFromAnyStartDate`,
   `shouldRepeatStartEndIntervalWithItsExactLength`: fail without the fix (e.g. 2026-03-05 instead of 2026-03-08),
   pass with it. Duration, calendar and timer tests (173) green. Full engine suite with F-5 to F-7: 16262 tests,
@@ -175,7 +175,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   cycle expression '<expression>'`. Before, an expression such as `0 0 0 30 2 ?` (30 February) deployed fine, was due
   immediately and repeated endlessly (a timer start event started instances in a tight loop). Now such a deployment
   fails, and an existing timer with such an expression fails with an incident instead of looping.
-- **Upstream:** no issue or PR (own fix). Findings log: `..\Review\FINDINGS.md` F-6.
+- **Upstream:** no issue or PR (own fix). Findings log: `..\operaton-dev\Review\FINDINGS.md` F-6.
 - **Test:** `CycleBusinessCalendarTest.shouldRejectCronExpressionWithoutNextExecution` (2 cases) and
   `StartTimerEventTest.shouldRejectDeploymentOfCronCycleWithoutNextExecution`: fail without the fix, pass with it.
   Calendar, timer and cron tests (176) green. Full engine suite: see F-5.
@@ -187,7 +187,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   that column only when acquiring exclusively over process hierarchies (off by default), so locking a job wrote NULL
   into it; queries by root process instance then missed every job that stayed in the table (retries left,
   incidents). Acquisition never changes the root process instance.
-- **Upstream:** no issue or PR (own fix). Findings log: `..\Review\FINDINGS.md` F-7.
+- **Upstream:** no issue or PR (own fix). Findings log: `..\operaton-dev\Review\FINDINGS.md` F-7.
 - **Test:** `AcquireJobsCmdTest.shouldKeepRootProcessInstanceIdWhenAcquiringJob` (job of a called subprocess, default
   setting): fails without the fix (`null` instead of the root id), passes with it. Job executor, job query and
   concurrency tests (347) green. Full engine suite: see F-5.
@@ -201,7 +201,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   job-executor threads were named `pool-N-thread-M` in the creating thread's group. Now they run in the group
   `Operaton BPM <pool name>` with names `Operaton BPM <pool name> - <n>` (thread dumps, monitoring). The threads'
   context class loader is unchanged (it is inherited from the creating thread with either factory).
-- **Upstream:** no issue or PR (own fix). Findings log: `..\Review\FINDINGS.md` F-9.
+- **Upstream:** no issue or PR (own fix). Findings log: `..\operaton-dev\Review\FINDINGS.md` F-9.
 - **Test:** `JBossSubsystemXMLTest.shouldRunJobExecutorThreadsWithConfiguredThreadFactory` (runs a task on the real
   MSC pool): fails without the fix (thread group `main`), passes with it. Subsystem tests (28) green, with
   `-Pdistro-wildfly`.
@@ -215,7 +215,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   "reduce cognitive complexity", which dropped it). Before the fix `createUserQuery().memberOfGroup(..).listPage(..)`
   returned all members on every page and looked up every member in LDAP for each page. `addMembersToList` is
   unchanged: its skip does not consume elements, so the member list holds all members, as before the refactoring.
-- **Upstream:** no issue or PR (own fix; owner decision 2026-11-21). Findings log: `..\Review\FINDINGS.md` F-10.
+- **Upstream:** no issue or PR (own fix; owner decision 2026-11-21). Findings log: `..\operaton-dev\Review\FINDINGS.md` F-10.
 - **Test:** `LdapUserQueryTest.testPaginationWithMemberOfGroup` (existing; runs only with `-Pdocker`, OpenLDAP via
   Testcontainers): fails without the fix (12 users instead of 2), passes with it.
 - **Drop when:** upstream restores the paging.
@@ -235,7 +235,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   deployment adds it to the engine's `<plugins>` (owner decision 2026-11-21: keep `deploymentAware=true` because
   process-application WARs will be used too).
 - **Upstream:** no issue or PR; upstream's (and Camunda 7's) documented behaviour. Findings log:
-  `..\Review\FINDINGS.md` F-11.
+  `..\operaton-dev\Review\FINDINGS.md` F-11.
 - **Test:** `JobExecutorDeploymentRegistrationPluginTest` (3 tests: Java-API, Modeler and process application
   deployments after a simulated restart; no-op without deployment awareness; more than one page);
   `DeploymentAwareJobExecutorTest` (9) and `ArchRulesTest` still green.
@@ -248,7 +248,7 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   out, so `/engine-rest` answers anyone who can reach the server). Only the WildFly REST WAR; the webapps (legacy and
   neo) use their own session-protected engine API and are not affected.
 - **Why:** deployment requirement (topic 2, "REST authentication"); the archive is the only place to change the WAR.
-- **Test:** the deployment's level-1 tests (`..\Deployment`): 401 without credentials, 200 with an LDAP user.
+- **Test:** the deployment's level-1 tests (`..\operaton-dev\Deployment`): 401 without credentials, 200 with an LDAP user.
 - **Drop when:** never as long as we ship the WildFly REST WAR; upstream will not change the default.
 
 ### Test: `QuerySessionFactoryTest` passes on Windows (2026-11-21)
@@ -257,13 +257,13 @@ Each entry: what changed, why, upstream issue (if any), the test that proves it,
   each mapper line to end with `System.lineSeparator()` instead of `"\n"`. `QuerySessionFactory.buildMappings` ends
   lines with `%n` (the platform line separator), so the test failed on Windows and passed on Linux. Production code
   unchanged; the generated MyBatis XML is valid with either line ending.
-- **Upstream:** no issue or PR (own change; owner decision 2026-11-21). Findings log: `..\Review\FINDINGS.md` O-5.
+- **Upstream:** no issue or PR (own change; owner decision 2026-11-21). Findings log: `..\operaton-dev\Review\FINDINGS.md` O-5.
 - **Test:** `webapps-neo/assembly`: 435 tests, 0 failures on Windows (before: 1 failure).
 - **Drop when:** upstream makes the test or the code platform-independent.
 
 ## Test suite: shorter runs, same or better coverage (2026-11-21, owner decision)
 
-Analysis, measurements and rejected options: `..\Review\FINDINGS.md` O-8. JUnit is already 6.0.3 here (property
+Analysis, measurements and rejected options: `..\operaton-dev\Review\FINDINGS.md` O-8. JUnit is already 6.0.3 here (property
 `version.junit5`). JUnit 4 was removed afterwards (owner decision, next section).
 
 ### Test: engine tests in 4 JVMs
@@ -336,7 +336,7 @@ Analysis, measurements and rejected options: `..\Review\FINDINGS.md` O-8. JUnit 
 ## JUnit 4 removed (2026-11-21, owner decision)
 
 The owner wants no outdated test technology in this fork, accepting that JUnit 4 tests written against Operaton no
-longer compile. Upstream still ships the JUnit 4 API (`main`, November 2026). Findings: `..\Review\FINDINGS.md` O-9.
+longer compile. Upstream still ships the JUnit 4 API (`main`, November 2026). Findings: `..\operaton-dev\Review\FINDINGS.md` O-9.
 
 ### JUnit 4 API and its tests deleted
 

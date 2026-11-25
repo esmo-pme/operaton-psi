@@ -8,16 +8,18 @@ branch; upstream's `TESTING.md` and `CONTRIBUTING.md` are still accurate referen
 
 ## This checkout
 
-- Workspace layout and shared rules (upstream/downstream, push rules, topic folders) are in `..\CLAUDE.md`.
-- This folder is a git worktree of `..\upstream` on the local branch **`2.2.2-orange`**, created from the upstream
-  release tag **`v2.2.2`** (commit `76a6873d`), not from upstream `main`. The `origin` remote is upstream; fetch only. The `fork` remote
-  (`https://github.com/esmo-pme/operaton-psi.git`) is the only allowed push target, branch `2.2.2-orange` only,
-  never `main`.
+- The topic folders (`Review`, `Deployment`, `Identity`) are local git repos in the sibling folder `..\operaton-dev\`
+  (no remote). `Artifacts` (WildFly archives) stays on `\\store.esmo-ag.de\users\pmetz\Operaton-Orange\Artifacts`.
+- This folder is a normal clone of the owner's fork on the branch **`2.2.2-orange`**, created from the upstream
+  release tag **`v2.2.2`** (commit `76a6873d`), not from upstream `main`. The `origin` remote is the fork
+  (`https://github.com/esmo-pme/operaton-psi.git`), the only allowed push target: branch `2.2.2-orange` only (set as
+  `remote.origin.push`), never `main` (a `pre-push` hook in `.git\hooks` blocks it; never bypass it). The official
+  upstream is not configured here. Push only when the owner asks.
 - Project version is **`2.2.2-orange.3`** (all POMs and `package.json` files). Change it only with
   `.devenv/scripts/maintenance/set-project-version.sh <version>` from Git Bash, then run `.\mvnw.cmd validate`.
 - Upstream maintains `release/2.2.x` after 2.2.2. Check it (and `main`) for an existing fix before writing one.
 - Record every deviation from `v2.2.2` in `FORK-PATCHES.md` (reason, upstream issue, proving test, removal condition).
-  Review notes, findings and reproducers live in `..\Review\`, not in this repository.
+  Review notes, findings and reproducers live in `..\operaton-dev\Review\`, not in this repository.
 - Versions: trust the root `pom.xml` (for `v2.2.2`: Spring Boot 4.1.3, Spring 7.0.11, Quarkus 3.40.1.2, MyBatis 3.5.19,
   Liquibase 4.33.0) and `parent/pom.xml` (WildFly 41.0.1.Final). Upstream docs list older versions.
 - Toolchain: JDK 25 (Temurin) and Maven 3.10.1 through the wrapper. Keep `maven.compiler.release=17`.
@@ -43,7 +45,7 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
   `-Djdk.xml.elementAttributeLimit=200` (required on Java 25 for `BpmnParseTest`), `--batch-mode`, and the Maven
   build cache disabled (opt in with `-Dmaven.build.cache.enabled=true`). Tests run in Europe/Berlin unless overridden.
 - `install` writes `org.operaton:*:2.2.2-orange.3` into `~/.m2/repository`, next to (not over) the released 2.2.2
-  artifacts. Reproducers in `..\Review\reproducers` use released 2.2.2 by default; test a local build with
+  artifacts. Reproducers in `..\operaton-dev\Review\reproducers` use released 2.2.2 by default; test a local build with
   `'-Doperaton.version=2.2.2-orange.3'`.
 - The WildFly modules (`distro/wildfly/*`, incl. the subsystem and its tests) are only in the reactor with the
   profile `distro-wildfly`, which is not active by default. Naming a profile explicitly switches off all
@@ -58,7 +60,7 @@ Run from the repository root with `JAVA_HOME` set to JDK 25 (`./mvnw` in Git Bas
   `$env:PATH = 'C:\Users\pmetz\AppData\Local\Programs\Git\bin;C:\msys64\ucrt64\bin;' + $env:PATH`.
   (Fallback without them: `'-Dexec.skip=true'` and check the module `resource-root` paths by hand.)
 - The WildFly archive is `distro/wildfly/distro/target/operaton-bpm-wildfly-<version>.tar.gz`; the handoff to
-  deployment (`..\Artifacts\`) is described in `..\Review\PLAN.md`. Check line endings of archive files with `file`,
+  deployment (`Artifacts` on the share, see above) is described in `..\operaton-dev\Review\PLAN.md`. Check line endings of archive files with `file`,
   not `grep $'\r'` (Git Bash's grep hides carriage returns); `.gitattributes` keeps `distro/**`, `*.sh` and `*.conf`
   LF.
 - Run module tests one module per Maven call: `ArchRulesTest` (from `test-utils/archunit`) imports with
