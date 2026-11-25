@@ -8,9 +8,11 @@ branch; upstream's `TESTING.md` and `CONTRIBUTING.md` are still accurate referen
 
 ## This checkout
 
-- Workspace layout and shared rules (upstream/downstream, never push, topic folders) are in `..\CLAUDE.md`.
+- Workspace layout and shared rules (upstream/downstream, push rules, topic folders) are in `..\CLAUDE.md`.
 - This folder is a git worktree of `..\upstream` on the local branch **`2.2.2-orange`**, created from the upstream
-  release tag **`v2.2.2`** (commit `76a6873d`), not from upstream `main`. The `origin` remote is upstream; fetch only.
+  release tag **`v2.2.2`** (commit `76a6873d`), not from upstream `main`. The `origin` remote is upstream; fetch only. The `fork` remote
+  (`https://github.com/esmo-pme/operaton-psi.git`) is the only allowed push target, branch `2.2.2-orange` only,
+  never `main`.
 - Project version is **`2.2.2-orange.3`** (all POMs and `package.json` files). Change it only with
   `.devenv/scripts/maintenance/set-project-version.sh <version>` from Git Bash, then run `.\mvnw.cmd validate`.
 - Upstream maintains `release/2.2.x` after 2.2.2. Check it (and `main`) for an existing fix before writing one.
